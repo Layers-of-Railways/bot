@@ -4,7 +4,6 @@ import { EmbedBuilder, Events } from 'discord.js';
 import logProviders from '../logProviders/_logProviders'
 import logAnalyzers from '../logAnalyzers/_logAnalyzers';
 
-import { COLORS } from '../constants';
 import { Handler } from '..';
 
 export type LogAnalyzer = (url: string) => Promise<null | { name: string, value: string }>;
@@ -78,7 +77,7 @@ export const logHandler: Handler = (client) => {
         .setTitle("Log analysis")
         .setDescription(`${issues.length || "No"} issue${issues.length == 1 ? "" : "s"} found automatically`)
         .setFields(...issues)
-        .setColor(issues.length ? COLORS.red : COLORS.green)
+        .setColor(issues.length ? "Red" : "Green")
 
       if (log != null) {
         message.reply({ embeds: [embed] });

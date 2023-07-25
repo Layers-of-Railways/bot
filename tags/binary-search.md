@@ -1,6 +1,6 @@
 ---
 title: Binary Search - A method of finding problems with mods
-color: blue
+color: Blue
 aliases: ['thanosmethod']
 ---
 

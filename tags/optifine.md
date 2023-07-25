@@ -1,6 +1,6 @@
 ---
 title: OptiFine
-color: green
+color: Green
 aliases: ['of', 'optimize', 'opticrap', 'notfine']
 ---
 

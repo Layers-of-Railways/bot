@@ -1,6 +1,6 @@
 ---
 title: Fixing modernfix compatibility issue
-color: pink
+color: Pink
 aliases: ['modernfixcompat']
 ---
 

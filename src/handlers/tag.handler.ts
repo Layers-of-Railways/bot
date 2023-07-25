@@ -1,9 +1,9 @@
 import matter from 'gray-matter';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
-import { COLORS } from '../constants';
 
 import { type EmbedField } from 'discord.js';
+import { readdirSync, readFileSync } from 'fs';
 
 interface Tag {
   name: string;
@@ -29,10 +29,28 @@ export const getTags = async (): Promise<Tag[]> => {
       ...data,
       name: _file.replace('.md', ''),
       content: content.trim(),
-      //@ts-expect-error yeah...
-      color: COLORS[data.color] || undefined,
+      color: data.color || undefined,
     });
   }
 
   return tags;
 };
+
+export const getTagsSync = (): Tag[] => {
+  const filenames = readdirSync(TAG_DIR)
+  const tags: Tag[] = []
+
+  for (const _file of filenames) {
+    const file = join(TAG_DIR, _file);
+    const { data, content } = matter(readFileSync(file));
+
+    tags.push({
+      ...data,
+      name: _file.replace('.md', ''),
+      content: content.trim(),
+      color: data.color || undefined,
+    });
+  }
+
+  return tags;
+}

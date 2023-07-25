@@ -1,6 +1,6 @@
 ---
 title: Upload Logs
-color: orange
+color: Orange
 aliases: ['sendlog', 'logs', '🪵']
 ---
 
