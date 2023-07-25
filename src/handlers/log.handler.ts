@@ -61,7 +61,16 @@ export const logHandler: Handler = (client) => {
 
       if (!log) return
 
-      if (!log.startsWith("---- Minecraft Crash Report ----")) return // check if it's a log
+      const regexPasses = [
+        /---- Minecraft Crash Report ----/, // Forge Crash report
+        /\n\\|[\\s\\d]+\\| Minecraft\\s+\\| minecraft\\s+\\| (\\S+).+\n/, // Quilt mod table
+        /: Loading Minecraft (\\S+)/, // Fabric, Quilt
+        /--fml.mcVersion, ([^\\s,]+)/, // Forge
+        /--version, ([^,]+),/, // ATLauncher
+        / --version (\\S+) / // MMC, Prism, PolyMC
+      ]
+
+      if (!regexPasses.find(reg => log.match(reg))) return
 
       const issues = await findIssues(log)
 
