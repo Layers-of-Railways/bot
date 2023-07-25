@@ -1,12 +1,8 @@
-import { Client, GatewayIntentBits, Partials, Events } from 'discord.js';
-import { reuploadCommands } from './_reupload';
-
-import { parseLog } from './logs';
-
-import { tagsCommand } from './commands/tags';
-import { sayCommand } from './commands/say';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
 
 import 'dotenv/config';
+import commandHandler from './handlers/command.handler';
+import { logHandler } from './handlers/log.handler';
 
 const client = new Client({
   intents: [
@@ -40,54 +36,18 @@ client.once('ready', async () => {
     activities: [{ name: `Steam 'n' Rails` }],
     status: 'online',
   });
-
-  client.on(Events.MessageCreate, async (e) => {
-    try {
-      if (e.channel.partial) await e.channel.fetch();
-      if (e.author.partial) await e.author.fetch();
-
-      if (!e.content) return;
-      if (!e.channel.isTextBased()) return;
-
-      if (e.author === client.user) return;
-
-      const log = await parseLog(e.content);
-      if (log != null) {
-        e.reply({ embeds: [log] });
-        return;
-      }
-    } catch (error) {
-      console.error('Unhandled exception on MessageCreate', error);
-    }
-  });
 });
 
-client.on(Events.InteractionCreate, async (interaction) => {
-  try {
-    if (!interaction.isChatInputCommand()) return;
+export type Handler = (client: Client<false>) => void;
 
-    const { commandName } = interaction;
 
-    if (commandName === 'ping') {
-      await interaction.reply({
-        content: `Pong! \`${client.ws.ping}ms\``,
-        ephemeral: true,
-      });
-    } else if (commandName === 'say') {
-      await sayCommand(interaction);
-    } else if (commandName === 'tag') {
-      await tagsCommand(interaction);
-    }
-  } catch (error) {
-    console.error('Unhandled exception on InteractionCreate', error);
-  }
-});
+const handlers: Handler[] = [
+  commandHandler,
+  logHandler
+]
 
-reuploadCommands()
-  .then(() => {
-    client.login(process.env.DISCORD_TOKEN);
-  })
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+for (const handler of handlers) {
+  handler(client)
+}
+
+client.login(process.env.DISCORD_TOKEN)

@@ -5,4 +5,4 @@ export const COLORS = {
   yellow: 0xfde047,
   pink: 0xffc0cb,
   orange: 0xfb923c,
-} as { [key: string]: number };
+};

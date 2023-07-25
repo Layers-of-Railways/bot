@@ -3,7 +3,7 @@ import {
   type CacheType,
   EmbedBuilder,
 } from 'discord.js';
-import { getTags } from '../tags';
+import { getTags } from '../handlers/tag.handler';
 
 export const tagsCommand = async (
   i: ChatInputCommandInteraction<CacheType>

@@ -1,7 +1,7 @@
 import matter from 'gray-matter';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
-import { COLORS } from './constants';
+import { COLORS } from '../constants';
 
 import { type EmbedField } from 'discord.js';
 
@@ -29,7 +29,8 @@ export const getTags = async (): Promise<Tag[]> => {
       ...data,
       name: _file.replace('.md', ''),
       content: content.trim(),
-      color: data.color ? COLORS[data.color] : undefined,
+      //@ts-expect-error yeah...
+      color: COLORS[data.color] || undefined,
     });
   }
 
