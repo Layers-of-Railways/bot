@@ -1,4 +1,15 @@
+<<<<<<< Updated upstream
 import { Client, GatewayIntentBits, Partials, EmbedBuilder } from 'discord.js';
+=======
+import { Client, GatewayIntentBits, Partials, Events } from 'discord.js';
+import { reuploadCommands } from './_reupload';
+
+//import { parseLog } from './logs';
+import { parseLog } from './logs/Analyzer';
+
+import { tagsCommand } from './commands/tags';
+import { sayCommand } from './commands/say';
+>>>>>>> Stashed changes
 
 import 'dotenv/config';
 import commandHandler from './handlers/command.handler';
