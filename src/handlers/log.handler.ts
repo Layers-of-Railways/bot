@@ -101,9 +101,7 @@ export const logHandler: Handler = (client) => {
             const issuesEmbed = new EmbedBuilder()
                 .setTitle('Log analysis')
                 .setDescription(
-                    `${issues.length} issue${
-                        issues.length == 1 ? '' : 's'
-                    } found automatically`
+                    `${issues.length} issue${issues.length == 1 ? '' : 's'} found automatically`
                 )
                 .setFields(...issues)
                 .setColor('Red');
