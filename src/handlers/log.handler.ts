@@ -2,7 +2,7 @@ import { EmbedBuilder, Events } from 'discord.js';
 
 // log providers
 import logProviders from '../logProviders/_logProviders';
-import logAnalyzers from '../logAnalyzers/_logAnalyzers';
+import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
 
 import { Handler } from '..';
 import { analyzers } from '../logs/Analyzer';
@@ -14,6 +14,10 @@ export interface LogProvider {
     hostnames: string[];
     parse: (url: string) => Promise<void | string>;
 }
+
+export type Analyzer = (
+    log: string
+) => Promise<{ name: string; value: string } | null>;
 
 const hostnameMap = new Map<string, (text: string) => Promise<void | string>>();
 
@@ -78,7 +82,6 @@ export const logHandler: Handler = (client) => {
 
             if (!regexPasses.find((reg) => log.match(reg))) return;
 
-            const issues = await findIssues(log);
             const logInfo: { name: string, value: string }[] = []
 
             for (const analyzer of analyzers) {
@@ -94,14 +97,6 @@ export const logHandler: Handler = (client) => {
 
             const issues = await findIssues(log);
 
-            const embed = new EmbedBuilder()
-                .setTitle('Log analysis')
-                .setDescription(
-                    `${issues.length || 'No'} issue${issues.length == 1 ? '' : 's'
-                    } found automatically`
-                )
-                .setFields(...issues)
-                .setColor(issues.length ? 'Red' : 'Green');
             if (!issues.length) {
                 message.reply({ embeds: [logInfoEmbed] })
                 return
@@ -116,20 +111,10 @@ export const logHandler: Handler = (client) => {
                 .setFields(...issues)
                 .setColor('Red');
 
-
-            if (log != null) {
-                message.reply({ embeds: [embed] });
-                return;
-            }
+            message.reply({ embeds: [logInfoEmbed, issuesEmbed] });
+            return;
         } catch (error) {
             console.error('Unhandled exception on MessageCreate', error);
         }
     });
-    message.reply({ embeds: [logInfoEmbed, issuesEmbed] });
-    return;
-
-} catch (error) {
-    console.error('Unhandled exception on MessageCreate', error);
-}
-  });
 };
