@@ -1,4 +1,7 @@
 {
+    "name": "snrbot",
+    "version": "1.0.0",
+    "license": "GPL-3.0",
     "scripts": {
         "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
         "start": "tsx src/index.ts",
@@ -10,6 +13,7 @@
         "colorette": "^2.0.20",
         "discord.js": "14.11.0",
         "express": "^4.18.2",
+        "gray-matter": "^4.0.3",
         "tsx": "3.12.7"
     },
     "devDependencies": {
@@ -20,7 +24,6 @@
         "cross-env": "^7.0.3",
         "dotenv": "16.3.1",
         "eslint": "8.43.0",
-        "gray-matter": "4.0.3",
         "prettier": "2.8.8",
         "typescript": "5.1.3"
     },
