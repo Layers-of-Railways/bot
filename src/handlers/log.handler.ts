@@ -82,24 +82,24 @@ export const logHandler: Handler = (client) => {
 
             if (!regexPasses.find((reg) => log.match(reg))) return;
 
-            const logInfo: { name: string, value: string }[] = []
+            const logInfo: { name: string; value: string }[] = [];
 
             for (const analyzer of analyzers) {
-                const info = await analyzer(log)
-                if (info) logInfo.push(info)
+                const info = await analyzer(log);
+                if (info) logInfo.push(info);
             }
 
             const logInfoEmbed = new EmbedBuilder()
-                .setTitle("Log File")
-                .setDescription("__Environment info__")
-                .setColor("Green")
-                .setFields(...logInfo)
+                .setTitle('Log File')
+                .setDescription('__Environment info__')
+                .setColor('Green')
+                .setFields(...logInfo);
 
             const issues = await findIssues(log);
 
             if (!issues.length) {
-                message.reply({ embeds: [logInfoEmbed] })
-                return
+                message.reply({ embeds: [logInfoEmbed] });
+                return;
             }
 
             const issuesEmbed = new EmbedBuilder()
