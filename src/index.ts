@@ -49,20 +49,16 @@ client.once(Events.ClientReady, async () => {
                 Webserver running on port: **${process.env.WEBSERVER_PORT}**
                 OS: **${process.platform}**
                 CPU Architecture: **${process.arch}**
-                Memory: **${
-                    Math.round(
-                        (process.memoryUsage().heapUsed / 1024 / 1024) * 100
-                    ) / 100
+                Memory: **${Math.round(
+                    (process.memoryUsage().heapUsed / 1024 / 1024) * 100
+                ) / 100
                 } MB**
                 Node.js version: **${process.version}**
-                TypeScript version: **${
-                    process.env.npm_package_devDependencies_typescript
+                TypeScript version: **${process.env.npm_package_devDependencies_typescript
                 }**
-                Discord.js version: **${
-                    process.env.npm_package_dependencies_discord_js
+                Discord.js version: **${process.env.npm_package_dependencies_discord_js
                 }**
-                Express version: **${
-                    process.env.npm_package_dependencies_express
+                Express version: **${process.env.npm_package_dependencies_express
                 }**
                 `
             )
