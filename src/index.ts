@@ -4,7 +4,6 @@ import 'dotenv/config';
 import commandHandler from './handlers/command.handler';
 import { logHandler } from './handlers/log.handler';
 import './webserver';
-import { green } from 'colorette';
 
 export const client = new Client({
     intents: [

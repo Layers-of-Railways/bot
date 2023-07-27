@@ -59,8 +59,7 @@ const actionStart = async (client: Client, req: Request) => {
     const unix_started_at = Math.floor(
         Date.parse(workflow_run.run_started_at) / 1000
     );
-    const run_number = await getRunNumber(workflow_run.url);
-    const version = await getVersion(workflow_run.url);
+    const version = await getVersion(workflow_run.url, workflow_run.run_number);
 
     const commitString = generateCommitsString(workflow_run.head_sha);
 
@@ -72,7 +71,7 @@ const actionStart = async (client: Client, req: Request) => {
         })
         .setDescription(
             `## Build <t:${unix_started_at}:R>
-            Status: Build is running for **#${run_number}** ${process.env.LOADING_EMOJI}
+            Status: Build is running for **#${workflow_run.run_number}** ${process.env.LOADING_EMOJI}
             Version: ${version}
             ${commitString}
             `
@@ -100,8 +99,7 @@ const actionCompleted = async (client: Client, req: Request) => {
     const unix_started_at = Math.floor(
         Date.parse(workflow_run.run_started_at) / 1000
     );
-    const run_number = await getRunNumber(workflow_run.url);
-    const version = await getVersion(workflow_run.url);
+    const version = await getVersion(workflow_run.url, workflow_run.run_number);
 
     const status =
         workflow_run.conclusion === 'success'
@@ -134,7 +132,7 @@ const actionCompleted = async (client: Client, req: Request) => {
         })
         .setDescription(
             `## Build <t:${unix_started_at}:R>
-            Status: **${status} #${run_number}** in ${timeTaken}
+            Status: **${status} #${workflow_run.run_number}** in ${timeTaken}
             Version: ${version}
             ${commitString}
             `
@@ -146,14 +144,25 @@ const actionCompleted = async (client: Client, req: Request) => {
         .setColor(statusColor);
 
     if (workflow_run.conclusion == 'success') {
+        const mod_version = await getRawVersion(workflow_run.url, 'mod');
+        const minecraft_version = await getRawVersion(
+            workflow_run.url,
+            'minecraft'
+        );
+
+        const versionFabric = `${mod_version}+fabric-mc${minecraft_version}-build.${workflow_run.run_number}`;
+        const versionForge = `${mod_version}+forge-mc${minecraft_version}-build.${workflow_run.run_number}`;
+        const fabricJar = `${process.env.MAVEN_REPO}${versionFabric}/Steam_Rails-${versionFabric}.jar`;
+        const forgeJar = `${process.env.MAVEN_REPO}${versionForge}/Steam_Rails-${versionForge}.jar`;
+
         const fabricButton = new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setLabel('Fabric')
-            .setURL(`${process.env.MAVEN_REPO}`);
+            .setURL(fabricJar);
         const forgeButton = new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setLabel('Forge')
-            .setURL(`${process.env.MAVEN_REPO}`);
+            .setURL(forgeJar);
 
         const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
             fabricButton,
@@ -169,6 +178,9 @@ const actionCompleted = async (client: Client, req: Request) => {
 };
 
 const generateCommitsString = (head_sha: string) => {
+    if (!commitMap.get(head_sha)) {
+        return 'No commits found';
+    }
     const commitsArray = commitMap.get(head_sha);
     if (!commitsArray) return;
     const commitString = commitsArray.commits
@@ -197,13 +209,7 @@ const getTimeTaken = (time: number) => {
     return timeTaken;
 };
 
-const getRunNumber = async (url: URL) => {
-    const request = await fetch(url);
-    const data = await request.json();
-    return data.run_number;
-};
-
-const getVersion = async (apiurl: URL) => {
+const getVersion = async (apiurl: URL, run_number: string) => {
     const runDataRequest = await fetch(apiurl);
     const runData = await runDataRequest.json();
 
@@ -220,9 +226,35 @@ const getVersion = async (apiurl: URL) => {
     if (modVersionLine && minecraftVersionLine) {
         const modVersion = modVersionLine.split('=')[1].trim();
         const minecraftVersion = minecraftVersionLine.split('=')[1].trim();
-        return `${modVersion}-mc${minecraftVersion}.${await getRunNumber(
-            apiurl
-        )}`;
+        return `${modVersion}-mc${minecraftVersion}.${run_number}`;
+    } else {
+        return "Couldn't find version";
+    }
+};
+
+const getRawVersion = async (apiurl: URL, type: string) => {
+    const runDataRequest = await fetch(apiurl);
+    const runData = await runDataRequest.json();
+
+    const request = await fetch(
+        `https://raw.githubusercontent.com/${runData.repository.full_name}/${runData.head_commit.id}/gradle.properties`
+    );
+    const data = await request.text();
+
+    const lines = data.split('\n');
+    const modVersionLine = lines.find((line) => line.startsWith('mod_version'));
+    const minecraftVersionLine = lines.find((line) =>
+        line.startsWith('minecraft_version')
+    );
+    if (modVersionLine && minecraftVersionLine) {
+        const modVersion = modVersionLine.split('=')[1].trim();
+        const minecraftVersion = minecraftVersionLine.split('=')[1].trim();
+        if (type == 'mod') {
+            return modVersion;
+        } else if (type == 'minecraft') {
+            return minecraftVersion;
+        }
+        return "Couldn't find version";
     } else {
         return "Couldn't find version";
     }
