@@ -3,7 +3,7 @@ import { getMinecraftVersion } from '../logs/Analyzer';
 
 export const minecraftVersionAnalyzer: Analyzer = async (log) => {
     const minecraftVersion = getMinecraftVersion(log);
-    console.log(minecraftVersion)
+    console.log(minecraftVersion);
     if (!minecraftVersion) return null;
     const incompatibleVersions = new Set(['1.19.3', '1.19.4']);
     if (incompatibleVersions.has(minecraftVersion))

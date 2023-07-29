@@ -6,7 +6,7 @@ import { optifineAnalyzer } from './optifine';
 export const logAnalyzers: Analyzer[] = [
     optifineAnalyzer,
     minecraftVersionAnalyzer,
-    createVersionAnalyzer
+    createVersionAnalyzer,
 ];
 
 export default logAnalyzers;
