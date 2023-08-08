@@ -3,6 +3,8 @@ export interface Mod {
     version: string;
 }
 
+//TODO: remove this comment
+
 export type Loader = 'Quilt' | 'Fabric' | 'Forge';
 
 const getMinecraftVersion = (log: string) => {
