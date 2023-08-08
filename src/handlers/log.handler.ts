@@ -142,12 +142,19 @@ export const logHandler: Handler = (client) => {
                 inline: true,
             });
 
-            if (parsedLog.mods?.has('create'))
+            if (parsedLog.mods?.has('create')) {
                 logInfo.push({
                     name: 'Create version',
                     value: parsedLog.mods.get('create')!,
                     inline: true,
                 });
+                if (parsedLog.mods?.has('create'))
+                    logInfo.push({
+                        name: '\u200b',
+                        value: '\u200b',
+                        inline: true,
+                    });
+            }
 
             if (parsedLog.mods?.has('railways'))
                 logInfo.push({

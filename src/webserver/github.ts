@@ -60,7 +60,6 @@ const actionStart = async (client: Client, req: Request) => {
         Date.parse(workflow_run.run_started_at) / 1000
     );
     const version = await getVersion(workflow_run.url, workflow_run.run_number);
-    const version = await getVersion(workflow_run.url, workflow_run.run_number);
 
     const commitString = generateCommitsString(workflow_run.head_sha);
 
@@ -73,7 +72,7 @@ const actionStart = async (client: Client, req: Request) => {
         .setDescription(
             `## Build <t:${unix_started_at}:R>
             Status: Build is running for **#${workflow_run.run_number}** ${process.env.LOADING_EMOJI}
-            Version: ${version}
+            Version: **${version}**
             ${commitString}
             `
         )
@@ -100,7 +99,6 @@ const actionCompleted = async (client: Client, req: Request) => {
     const unix_started_at = Math.floor(
         Date.parse(workflow_run.run_started_at) / 1000
     );
-    const version = await getVersion(workflow_run.url, workflow_run.run_number);
     const version = await getVersion(workflow_run.url, workflow_run.run_number);
 
     const status =
@@ -135,7 +133,7 @@ const actionCompleted = async (client: Client, req: Request) => {
         .setDescription(
             `## Build <t:${unix_started_at}:R>
             Status: **${status} #${workflow_run.run_number}** in ${timeTaken}
-            Version: ${version}
+            Version: **${version}**
             ${commitString}
             `
         )
@@ -152,33 +150,39 @@ const actionCompleted = async (client: Client, req: Request) => {
             'minecraft'
         );
 
-        const versionFabric = `${mod_version}+fabric-mc${minecraft_version}-build.${workflow_run.run_number}`;
-        const versionForge = `${mod_version}+forge-mc${minecraft_version}-build.${workflow_run.run_number}`;
-        const fabricJar = `${process.env.MAVEN_REPO}${versionFabric}/Steam_Rails-${versionFabric}.jar`;
-        const forgeJar = `${process.env.MAVEN_REPO}${versionForge}/Steam_Rails-${versionForge}.jar`;
+        const fabricJar = generateMavenUrl(
+            mod_version,
+            minecraft_version,
+            workflow_run.run_number,
+            'fabric'
+        );
+        const forgeJar = generateMavenUrl(
+            mod_version,
+            minecraft_version,
+            workflow_run.run_number,
+            'forge'
+        );
 
         const fabricButton = new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setLabel('Fabric')
             .setURL(fabricJar);
-            .setURL(fabricJar);
-const forgeButton = new ButtonBuilder()
-    .setStyle(ButtonStyle.Link)
-    .setLabel('Forge')
-    .setURL(forgeJar);
+        const forgeButton = new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setLabel('Forge')
             .setURL(forgeJar);
 
-const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    fabricButton,
-    forgeButton
-);
+        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            fabricButton,
+            forgeButton
+        );
 
-oldMessage.edit({ embeds: [embed], components: [actionRow] });
-githubMap.delete(workflow_run.id);
+        oldMessage.edit({ embeds: [embed], components: [actionRow] });
+        githubMap.delete(workflow_run.id);
     } else {
-    oldMessage.edit({ embeds: [embed] });
-    githubMap.delete(workflow_run.id);
-}
+        oldMessage.edit({ embeds: [embed] });
+        githubMap.delete(workflow_run.id);
+    }
 };
 
 const generateMavenUrl = (
@@ -193,9 +197,6 @@ const generateMavenUrl = (
 };
 
 const generateCommitsString = (head_sha: string) => {
-    if (!commitMap.get(head_sha)) {
-        return 'No commits found';
-    }
     if (!commitMap.get(head_sha)) {
         return 'No commits found';
     }
@@ -227,8 +228,9 @@ const getTimeTaken = (time: number) => {
     const secondsString =
         seconds > 0 ? `${seconds} second${seconds !== 1 ? 's' : ''}` : '';
 
-    const timeTaken = `${minutesString}${minutesString && secondsString ? ' and ' : ''
-        }${secondsString}`;
+    const timeTaken = `${minutesString}${
+        minutesString && secondsString ? ' and ' : ''
+    }${secondsString}`;
 
     return timeTaken;
 };
@@ -250,59 +252,52 @@ const getVersion = async (apiurl: URL, run_number: string) => {
     if (modVersionLine && minecraftVersionLine) {
         const modVersion = modVersionLine.split('=')[1].trim();
         const minecraftVersion = minecraftVersionLine.split('=')[1].trim();
-        return `${modVersion}-mc${minecraftVersion}.${run_number}`;
+        return `${modVersion}-mc${minecraftVersion}-build.${run_number}`;
     } else {
         return "Couldn't find version";
     }
 };
 
 const getRawVersion = async (apiurl: URL, type: string) => {
-    const getRawVersion = async (apiurl: URL, type: string) => {
-        const runDataRequest = await fetch(apiurl);
-        const runData = await runDataRequest.json();
+    const runDataRequest = await fetch(apiurl);
+    const runData = await runDataRequest.json();
 
-        const request = await fetch(
-            `https://raw.githubusercontent.com/${runData.repository.full_name}/${runData.head_commit.id}/gradle.properties`
-        );
-        const data = await request.text();
+    const request = await fetch(
+        `https://raw.githubusercontent.com/${runData.repository.full_name}/${runData.head_commit.id}/gradle.properties`
+    );
+    const data = await request.text();
 
-        const lines = data.split('\n');
-        const modVersionLine = lines.find((line) => line.startsWith('mod_version'));
-        const minecraftVersionLine = lines.find((line) =>
-            line.startsWith('minecraft_version')
-        );
-        if (modVersionLine && minecraftVersionLine) {
-            const modVersion = modVersionLine.split('=')[1].trim();
-            const minecraftVersion = minecraftVersionLine.split('=')[1].trim();
-            if (type == 'mod') {
-                return modVersion;
-            } else if (type == 'minecraft') {
-                return minecraftVersion;
-            }
-            return "Couldn't find version";
-            if (type == 'mod') {
-                return modVersion;
-            } else if (type == 'minecraft') {
-                return minecraftVersion;
-            }
-            return "Couldn't find version";
-        } else {
-            return "Couldn't find version";
+    const lines = data.split('\n');
+    const modVersionLine = lines.find((line) => line.startsWith('mod_version'));
+    const minecraftVersionLine = lines.find((line) =>
+        line.startsWith('minecraft_version')
+    );
+    if (modVersionLine && minecraftVersionLine) {
+        const modVersion = modVersionLine.split('=')[1].trim();
+        const minecraftVersion = minecraftVersionLine.split('=')[1].trim();
+        if (type == 'mod') {
+            return modVersion;
+        } else if (type == 'minecraft') {
+            return minecraftVersion;
         }
-    };
+        return "Couldn't find version";
+    } else {
+        return "Couldn't find version";
+    }
+};
 
-    const verify_signature = (req: Request) => {
-        const signature = crypto
-            .createHmac('sha256', WEBHOOK_SECRET)
-            .update(JSON.stringify(req.body))
-            .digest('hex');
-        return `sha256=${signature}` === req.headers['x-hub-signature-256'];
-    };
+const verify_signature = (req: Request) => {
+    const signature = crypto
+        .createHmac('sha256', WEBHOOK_SECRET)
+        .update(JSON.stringify(req.body))
+        .digest('hex');
+    return `sha256=${signature}` === req.headers['x-hub-signature-256'];
+};
 
-    const isBuildRun = (req: Request) => {
-        if (req.body.workflow_run.path == '.github/workflows/build.yml') {
-            return true;
-        } else {
-            return false;
-        }
-    };
+const isBuildRun = (req: Request) => {
+    if (req.body.workflow_run.path == '.github/workflows/build.yml') {
+        return true;
+    } else {
+        return false;
+    }
+};
