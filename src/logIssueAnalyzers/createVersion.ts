@@ -1,7 +1,5 @@
 import { Analyzer } from '../handlers/log.handler';
 
-//TODO: remove this comment
-
 export const createVersionAnalyzer: Analyzer = async (log) => {
     const matchesCreate = log.mods
         ? log.mods.get('create') == '0.5.1.c'

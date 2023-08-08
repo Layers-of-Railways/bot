@@ -1,7 +1,5 @@
 import { Analyzer } from '../handlers/log.handler';
 
-//TODO: remove this comment
-
 export const optifineAnalyzer: Analyzer = async (log) => {
     const matchesOptifine = log.mods
         ? log.mods.has('optifine')

@@ -1,7 +1,5 @@
 import { Analyzer } from '../handlers/log.handler';
 
-//TODO: remove this comment
-
 export const minecraftVersionAnalyzer: Analyzer = async (log) => {
     const minecraftVersion = log.gameVersion;
     if (!minecraftVersion) return null;

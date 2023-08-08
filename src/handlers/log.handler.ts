@@ -1,7 +1,5 @@
 import { EmbedBuilder, Events, inlineCode } from 'discord.js';
 
-//TODO: remove this comment
-
 // log providers
 import logProviders from '../logProviders/_logProviders';
 import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
