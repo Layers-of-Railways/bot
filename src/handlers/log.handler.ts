@@ -1,11 +1,11 @@
-import { EmbedBuilder, Events } from 'discord.js';
+import { EmbedBuilder, Events, inlineCode } from 'discord.js';
 
 // log providers
 import logProviders from '../logProviders/_logProviders';
 import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
 
 import { Handler } from '..';
-import { analyzers } from '../logs/Analyzer';
+import { Log } from '../logs/Log';
 
 export type LogAnalyzer = (
     url: string
@@ -16,7 +16,7 @@ export interface LogProvider {
 }
 
 export type Analyzer = (
-    log: string
+    log: Log
 ) => Promise<{ name: string; value: string } | null>;
 
 const hostnameMap = new Map<string, (text: string) => Promise<void | string>>();
@@ -38,7 +38,7 @@ async function parseWebLog(text: string): Promise<string | void> {
     return hostnameMap.get(hostname)!(url);
 }
 
-async function findIssues(log: string) {
+async function findIssues(log: Log) {
     const issues: { name: string; value: string }[] = [];
 
     for (const analyzer of logAnalyzers) {
@@ -82,12 +82,76 @@ export const logHandler: Handler = (client) => {
 
             if (!regexPasses.find((reg) => log.match(reg))) return;
 
-            const logInfo: { name: string; value: string }[] = [];
+            const parsedLog = new Log(log)
 
-            for (const analyzer of analyzers) {
-                const info = await analyzer(log);
-                if (info) logInfo.push(info);
+            const logInfo: { name: string; value: string, inline?: boolean }[] = [];
+
+            if (parsedLog.javaVersion) {
+                logInfo.push({
+                    name: "Java Version",
+                    value: inlineCode(parsedLog.javaVersion)
+                })
             }
+
+            if (parsedLog.gameVersion) {
+                logInfo.push({
+                    name: "Minecraft Version",
+                    value: inlineCode(parsedLog.gameVersion)
+                })
+            }
+
+            if (parsedLog.loader) {
+                logInfo.push({
+                    name: "Mod Loader",
+                    value: inlineCode(`${parsedLog.loader.name} (${parsedLog.loader.version})`),
+                    inline: !!parsedLog.mods
+                })
+            }
+
+            if (parsedLog.mods) {
+                logInfo.push({
+                    name: "\u200b",
+                    value: "\u200b",
+                    inline: true
+                })
+                logInfo.push({
+                    name: "Mods loaded",
+                    value: inlineCode(parsedLog.mods.size.toString()),
+                    inline: true
+                })
+            }
+
+            logInfo.push({
+                name: "Errors",
+                value: inlineCode(parsedLog.errorCount.toString()),
+                inline: true
+            })
+
+            logInfo.push({
+                name: "\u200b",
+                value: "\u200b",
+                inline: true
+            })
+
+            logInfo.push({
+                name: "Warnings",
+                value: inlineCode(parsedLog.warnCount.toString()),
+                inline: true
+            })
+
+            if (parsedLog.mods?.has("create"))
+                logInfo.push({
+                    name: "Create version",
+                    value: parsedLog.mods.get("create")!,
+                    inline: true
+                })
+
+            if (parsedLog.mods?.has("railways"))
+                logInfo.push({
+                    name: "Steam 'n' Rails version",
+                    value: parsedLog.mods.get("railways")!,
+                    inline: true
+                })
 
             const logInfoEmbed = new EmbedBuilder()
                 .setTitle('Log File')
@@ -95,7 +159,7 @@ export const logHandler: Handler = (client) => {
                 .setColor('Green')
                 .setFields(...logInfo);
 
-            const issues = await findIssues(log);
+            const issues = await findIssues(parsedLog);
 
             if (!issues.length) {
                 message.reply({ embeds: [logInfoEmbed] });
@@ -105,8 +169,7 @@ export const logHandler: Handler = (client) => {
             const issuesEmbed = new EmbedBuilder()
                 .setTitle('Log analysis')
                 .setDescription(
-                    `${issues.length} issue${
-                        issues.length == 1 ? '' : 's'
+                    `${issues.length} issue${issues.length == 1 ? '' : 's'
                     } found automatically`
                 )
                 .setFields(...issues)
