@@ -82,76 +82,79 @@ export const logHandler: Handler = (client) => {
 
             if (!regexPasses.find((reg) => log.match(reg))) return;
 
-            const parsedLog = new Log(log)
+            const parsedLog = new Log(log);
 
-            const logInfo: { name: string; value: string, inline?: boolean }[] = [];
+            const logInfo: { name: string; value: string; inline?: boolean }[] =
+                [];
 
             if (parsedLog.javaVersion) {
                 logInfo.push({
-                    name: "Java Version",
-                    value: inlineCode(parsedLog.javaVersion)
-                })
+                    name: 'Java Version',
+                    value: inlineCode(parsedLog.javaVersion),
+                });
             }
 
             if (parsedLog.gameVersion) {
                 logInfo.push({
-                    name: "Minecraft Version",
-                    value: inlineCode(parsedLog.gameVersion)
-                })
+                    name: 'Minecraft Version',
+                    value: inlineCode(parsedLog.gameVersion),
+                });
             }
 
             if (parsedLog.loader) {
                 logInfo.push({
-                    name: "Mod Loader",
-                    value: inlineCode(`${parsedLog.loader.name} (${parsedLog.loader.version})`),
-                    inline: !!parsedLog.mods
-                })
+                    name: 'Mod Loader',
+                    value: inlineCode(
+                        `${parsedLog.loader.name} (${parsedLog.loader.version})`
+                    ),
+                    inline: !!parsedLog.mods,
+                });
             }
 
             if (parsedLog.mods) {
                 logInfo.push({
-                    name: "\u200b",
-                    value: "\u200b",
-                    inline: true
-                })
+                    name: '\u200b',
+                    value: '\u200b',
+                    inline: true,
+                });
                 logInfo.push({
-                    name: "Mods loaded",
+                    name: 'Mods loaded',
                     value: inlineCode(parsedLog.mods.size.toString()),
-                    inline: true
-                })
+                    inline: true,
+                });
             }
 
             logInfo.push({
-                name: "Errors",
+                name: 'Errors',
                 value: inlineCode(parsedLog.errorCount.toString()),
-                inline: true
-            })
+                inline: true,
+            });
 
             logInfo.push({
-                name: "\u200b",
-                value: "\u200b",
-                inline: true
-            })
+                name: '\u200b',
+                value: '\u200b',
+                inline: true,
+            });
 
             logInfo.push({
-                name: "Warnings",
+                name: 'Warnings',
                 value: inlineCode(parsedLog.warnCount.toString()),
-                inline: true
-            })
+                inline: true,
+            });
 
-            if (parsedLog.mods?.has("create"))
+            if (parsedLog.mods?.has('create'))
                 logInfo.push({
-                    name: "Create version",
-                    value: parsedLog.mods.get("create")!,
-                    inline: true
-                })
+                    name: 'Create version',
+                    value: parsedLog.mods.get('create')!,
+                    inline: true,
+                });
 
-            if (parsedLog.mods?.has("railways"))
+            if (parsedLog.mods?.has('railways'))
                 logInfo.push({
                     name: "Steam 'n' Rails version",
-                    value: parsedLog.mods.get("railways")!,
-                    inline: true
-                })
+                    value: parsedLog.mods.get('railways')!,
+                    inline: true,
+                });
 
             const logInfoEmbed = new EmbedBuilder()
                 .setTitle('Log File')
@@ -169,7 +172,8 @@ export const logHandler: Handler = (client) => {
             const issuesEmbed = new EmbedBuilder()
                 .setTitle('Log analysis')
                 .setDescription(
-                    `${issues.length} issue${issues.length == 1 ? '' : 's'
+                    `${issues.length} issue${
+                        issues.length == 1 ? '' : 's'
                     } found automatically`
                 )
                 .setFields(...issues)

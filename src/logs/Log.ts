@@ -1,11 +1,9 @@
 export interface Mod {
-    id: string,
-    version: string
+    id: string;
+    version: string;
 }
 
-export type Loader = 'Quilt' | 'Fabric' | 'Forge'
-
-
+export type Loader = 'Quilt' | 'Fabric' | 'Forge';
 
 const getMinecraftVersion = (log: string) => {
     const minecraftVerionRegexes = [
@@ -34,9 +32,7 @@ const getJavaVersion = (log: string) => {
     }
 };
 
-function getLoader(
-    log: string
-): { name: Loader, version: string } | undefined {
+function getLoader(log: string): { name: Loader; version: string } | undefined {
     const loaderRegexes = new Map<Loader, RegExp[]>();
     loaderRegexes.set('Quilt', [
         /\n\|[\s\d]+\| Quilt Loader\s+\| quilt_loader\s+\| (\S+).+\n/,
@@ -46,7 +42,7 @@ function getLoader(
     loaderRegexes.set('Forge', [
         /--fml.forgeVersion, ([^\s,]+)/,
         /MinecraftForge v([^\\s,]+) Initialized/,
-        /FML: ([^\s,]+)/
+        /FML: ([^\s,]+)/,
     ]);
 
     for (const loader of loaderRegexes.keys()) {
@@ -65,54 +61,55 @@ function getLoader(
 }
 
 export class Log {
-    readonly warnCount: number
-    readonly errorCount: number
-    readonly loader?: { name: Loader, version: string }
-    readonly gameVersion?: string
-    readonly javaVersion?: string
-    readonly mods?: Map<string, string>
-    readonly content: string
+    readonly warnCount: number;
+    readonly errorCount: number;
+    readonly loader?: { name: Loader; version: string };
+    readonly gameVersion?: string;
+    readonly javaVersion?: string;
+    readonly mods?: Map<string, string>;
+    readonly content: string;
     constructor(log: string) {
-        this.content = log
-        this.loader = getLoader(log)
-        this.gameVersion = getMinecraftVersion(log)
-        this.javaVersion = getJavaVersion(log)
-        this.warnCount = log.match(/\[*\/WARN\]/g)?.length ?? 0
-        this.errorCount = log.match(/\[*\/ERROR\]/g)?.length ?? 0
-        if (this.loader?.name == "Fabric") {
-            const modMatch = log.match(/- (\w|-)+ (\w+.|\w+)+/g)
+        this.content = log;
+        this.loader = getLoader(log);
+        this.gameVersion = getMinecraftVersion(log);
+        this.javaVersion = getJavaVersion(log);
+        this.warnCount = log.match(/\[*\/WARN\]/g)?.length ?? 0;
+        this.errorCount = log.match(/\[*\/ERROR\]/g)?.length ?? 0;
+        if (this.loader?.name == 'Fabric') {
+            const modMatch = log.match(/- (\w|-)+ (\w+.|\w+)+/g);
             if (modMatch) {
-                this.mods = new Map<string, string>(modMatch.map(modText => {
-                    const modInfo = modText.split(" ")
-                    return [
-                        modInfo[1],
-                        modInfo[2]
-                    ]
-                }))
+                this.mods = new Map<string, string>(
+                    modMatch.map((modText) => {
+                        const modInfo = modText.split(' ');
+                        return [modInfo[1], modInfo[2]];
+                    })
+                );
             }
-        } else if (this.loader?.name == "Quilt") {
-            const modMatch = log.match(/ ([a-z]|-|_)+ *\| (\w+.|\w+)+/g)
+        } else if (this.loader?.name == 'Quilt') {
+            const modMatch = log.match(/ ([a-z]|-|_)+ *\| (\w+.|\w+)+/g);
             if (modMatch) {
-                this.mods = new Map<string, string>(modMatch.map(modText => {
-                    const modInfo = modText.split(" ").filter(a => a && a != "|")
-                    return [
-                        modInfo[0],
-                        modInfo[1]
-                    ]
-                }))
+                this.mods = new Map<string, string>(
+                    modMatch.map((modText) => {
+                        const modInfo = modText
+                            .split(' ')
+                            .filter((a) => a && a != '|');
+                        return [modInfo[0], modInfo[1]];
+                    })
+                );
             }
-        } else if (this.loader?.name == "Forge") {
-            const modMatch = log.match(/\|([^ A-Z])+ *\|\d[^ |]+/g)
+        } else if (this.loader?.name == 'Forge') {
+            const modMatch = log.match(/\|([^ A-Z])+ *\|\d[^ |]+/g);
             if (modMatch) {
-                this.mods = new Map<string, string>(modMatch.map(modText => {
-                    const modInfo = modText.split(" ").map(text => text.slice(1)).filter(text => text)
-                    return [
-                        modInfo[0],
-                        modInfo[1]
-                    ]
-                }))
+                this.mods = new Map<string, string>(
+                    modMatch.map((modText) => {
+                        const modInfo = modText
+                            .split(' ')
+                            .map((text) => text.slice(1))
+                            .filter((text) => text);
+                        return [modInfo[0], modInfo[1]];
+                    })
+                );
             }
-
         }
     }
 }
