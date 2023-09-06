@@ -14,6 +14,6 @@ app.post('/github-webhook', function (req, res) {
     handleWebhook(client, req, res);
 });
 
-const port = process.env.WEBSERVER_PORT;
+const port = process.env.WEBSERVER_PORT || 3000;
 app.listen(port);
 console.log(`Webserver is running on port: ${port}`);
