@@ -1,17 +1,17 @@
 import {
     ButtonBuilder,
-    ButtonComponentData,
     ButtonInteraction,
     Events,
     InteractionButtonComponentData,
-    LinkButtonComponentData,
 } from 'discord.js';
 import { Handler } from '..';
-import { BaseSchema, Output, any, parse, unknown } from 'valibot';
+import { BaseSchema, Output } from 'valibot';
 import { error } from 'console';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buttonMap = new Map<string, Button<any>>();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class Button<ArgsType extends BaseSchema<any, any>> {
     id: string;
     args?: ArgsType;
