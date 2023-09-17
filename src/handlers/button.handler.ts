@@ -11,8 +11,7 @@ import { error } from 'console';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buttonMap = new Map<string, Button<any>>();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Button<ArgsType extends BaseSchema<any, any>> {
+export class Button<ArgsType extends BaseSchema> {
     id: string;
     args?: ArgsType;
     _onPress?: (interaction: ButtonInteraction, args: ArgsType) => unknown;
@@ -51,7 +50,6 @@ export const buttonHandler: Handler = (client) => {
     client.on(Events.InteractionCreate, async (interaction) => {
         if (!interaction.isButton()) return;
         const data = JSON.parse(interaction.customId);
-        console.log(data);
         const args = data.args;
         if (!data.id) return;
         if (!buttonMap.has(data.id)) return;
