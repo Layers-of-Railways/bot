@@ -8,6 +8,18 @@ import {
     SlashCommandBuilder,
 } from 'discord.js';
 import { Command } from '../../handlers/command.handler';
+import { Button } from '../../handlers/button.handler';
+import { string } from 'valibot';
+
+const verifyButtonSchema = string();
+
+const verifyButton = new Button(
+    'verify',
+    verifyButtonSchema,
+    (interaction, data) => {
+        interaction.reply(data);
+    }
+);
 
 export const verificationEmbedCommand: Command = {
     data: new SlashCommandBuilder()
@@ -40,11 +52,13 @@ export const verificationEmbedCommand: Command = {
             })
             .setColor(Colors.Green);
 
-        const button = new ButtonBuilder()
-            .setStyle(ButtonStyle.Success)
-            .setLabel('Verify')
-            .setCustomId('verify-button')
-            .setDisabled(disabled);
+        const button = verifyButton.button(
+            {
+                style: ButtonStyle.Success,
+                label: 'Verify',
+            },
+            interaction.user.username
+        );
 
         const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
             button
