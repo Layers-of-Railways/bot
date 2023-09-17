@@ -15,23 +15,19 @@ export class Button<ArgsType extends BaseSchema> {
     id: string;
     args?: ArgsType;
     _onPress?: (interaction: ButtonInteraction, args: ArgsType) => unknown;
-    constructor(id: string) {
-        this.id = id;
-        if (buttonMap.has(id)) console.error(`Button ${id} is already defined`);
-        buttonMap.set(id, this);
-    }
-    setArgs(args: ArgsType) {
-        this.args = args;
-        return this;
-    }
-    onPress(
-        handler: (
+    constructor(
+        id: string,
+        args: ArgsType,
+        onPress: (
             interaction: ButtonInteraction,
             args: Output<ArgsType>
         ) => unknown
     ) {
-        this._onPress = handler;
-        return this;
+        this.id = id;
+        if (buttonMap.has(id)) console.error(`Button ${id} is already defined`);
+        buttonMap.set(id, this);
+        this._onPress = onPress;
+        this.args = args;
     }
 
     button(
@@ -54,7 +50,8 @@ export const buttonHandler: Handler = (client) => {
         if (!data.id) return;
         if (!buttonMap.has(data.id)) return;
         const button = buttonMap.get(data.id);
-        if (!button?.args) throw error('No args set in button');
+        if (!button) return;
+        if (!button.args) throw error('No args set in button');
         const parsedArgs = button.args.parse(args);
         if (!button._onPress) return;
         button._onPress(interaction, parsedArgs);
