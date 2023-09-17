@@ -12,6 +12,7 @@ import { logHandler } from './handlers/log.handler';
 import { reloadGlobalSlashCommands } from './handlers/command.handler';
 import './webserver';
 import { buttonHandler } from './handlers/button.handler';
+import textCommandHandler from './handlers/textCommand.handler';
 
 export const client = new Client({
     intents: [
@@ -83,7 +84,12 @@ client.once(Events.ClientReady, async () => {
 
 export type Handler = (client: Client<false>) => void;
 
-const handlers: Handler[] = [commandHandler, logHandler, buttonHandler];
+const handlers: Handler[] = [
+    commandHandler,
+    textCommandHandler,
+    logHandler,
+    buttonHandler,
+];
 
 for (const handler of handlers) {
     handler(client);

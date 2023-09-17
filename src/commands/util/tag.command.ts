@@ -1,4 +1,4 @@
-import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
 import { getTags, getTagsSync } from '../../handlers/tag.handler';
 import { Command } from '../../handlers/command.handler';
 
@@ -53,4 +53,32 @@ export const tagCommand: Command = {
             embeds: [embed],
         });
     },
+};
+
+export const tagCommandTextBased = async (event: Message<boolean>) => {
+    const tagName = event.content.split('!!')[1];
+
+    const tags = await getTags();
+
+    const tag = tags.find(
+        (tag) => tag.name === tagName || tag.aliases?.includes(tagName)
+    );
+
+    if (!tag) {
+        await event.channel.send({
+            content: `Tag \`${tagName}\` does not exist.`,
+        });
+        return;
+    }
+
+    const embed = new EmbedBuilder();
+    embed.setTitle(tag.title ?? tag.name);
+    embed.setDescription(tag.content);
+    if (tag.color) embed.setColor(tag.color);
+    if (tag.image) embed.setImage(tag.image);
+    if (tag.fields) embed.setFields(tag.fields);
+
+    await event.channel.send({
+        embeds: [embed],
+    });
 };
