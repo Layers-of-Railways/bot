@@ -1,6 +1,6 @@
 ---
 title: Multiloader workflow
-color: Orange
+color: Pink
 aliases: ['multiloader']
 ---
 

@@ -15,4 +15,4 @@ The procedure is simple:
    IF NO: Swap out the current things with the ones set aside, and repeat from step 1.
 4. Repeat this process until the problematic thing/s have been found.
 
-_Credit to the Quilt Community discord and the Forge Discord for these instructions._
+_Credit to the Quilt Community discord and the NeoForge Discord for these instructions._

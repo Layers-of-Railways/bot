@@ -64,12 +64,7 @@ export const tagCommandTextBased = async (event: Message<boolean>) => {
         (tag) => tag.name === tagName || tag.aliases?.includes(tagName)
     );
 
-    if (!tag) {
-        await event.channel.send({
-            content: `Tag \`${tagName}\` does not exist.`,
-        });
-        return;
-    }
+    if (!tag) return;
 
     const embed = new EmbedBuilder();
     embed.setTitle(tag.title ?? tag.name);

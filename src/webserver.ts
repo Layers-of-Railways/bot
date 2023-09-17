@@ -1,7 +1,6 @@
 import express from 'express';
 import { handleWebhook } from './webserver/github';
 import { client } from './index';
-import { handleRequest } from './webserver/minecraft';
 
 const app = express();
 
@@ -13,10 +12,6 @@ app.get('/', function (req, res) {
 
 app.post('/github-webhook', function (req, res) {
     handleWebhook(client, req, res);
-});
-
-app.post('/minecraft-webhook', function (req, res) {
-    handleRequest(client, req, res);
 });
 
 const port = process.env.WEBSERVER_PORT || 3000;
