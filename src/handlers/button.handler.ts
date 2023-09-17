@@ -50,7 +50,6 @@ export const buttonHandler: Handler = (client) => {
     client.on(Events.InteractionCreate, async (interaction) => {
         if (!interaction.isButton()) return;
         const data = JSON.parse(interaction.customId);
-        console.log(data);
         const args = data.args;
         if (!data.id) return;
         if (!buttonMap.has(data.id)) return;
