@@ -27,5 +27,14 @@ export const createVersionAnalyzer: Analyzer = async (log) => {
             value: "Create: Steam 'n' Rails `1.4.3` is incompatible with `Create 0.5.1c`. Upgrade Steam 'n' Rails to `1.5.0`.",
         };
     }
+
+    // Steam 'n' Rails is currently incompatible with Create 0.5.1.e
+    if (log.mods.get('create') == '0.5.1.e') {
+        return {
+            name: 'Incompatible with Create 0.5.1.e',
+            value: "Create: Steam 'n' Rails is currently incompatible with `Create 0.5.1.e`",
+        };
+    }
+
     return null;
 };
