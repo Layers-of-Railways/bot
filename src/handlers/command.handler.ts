@@ -85,17 +85,29 @@ const commandHandler: Handler = (client) => {
             await commandCollection
                 .get(interaction.commandName)!
                 .execute(interaction); // try execute the command
+            if (!interaction.replied)
+                interaction.reply({
+                    embeds: [
+                        new EmbedBuilder({
+                            color: 0x22ffff,
+                            title: 'Command executed with no output.',
+                        }),
+                    ],
+                    ephemeral: true,
+                });
         } catch (error) {
             // in case of an error
-            await interaction.followUp({
-                // send a followup to the interaction
-                embeds: [
-                    new EmbedBuilder({
-                        color: 0xff2222,
-                        title: 'Internal error',
-                    }),
-                ],
-            });
+
+            if (interaction.isRepliable())
+                await interaction.reply({
+                    embeds: [
+                        new EmbedBuilder({
+                            color: 0xff2222,
+                            title: "Command couldn't get executed",
+                        }),
+                    ],
+                    ephemeral: true,
+                });
             return;
         }
     });
