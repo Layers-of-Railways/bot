@@ -34,19 +34,19 @@ export const warnCommand: Command = {
 
         const reason = interaction.options.get('reason', true);
 
-        if (member.id === interaction.user.id) {
-            return await interaction.reply({
-                content: 'You cannot warn yourself.',
-                ephemeral: true,
-            });
-        }
-
         if (!member) {
             await interaction.reply({
                 content: 'User not found.',
                 ephemeral: true,
             });
             return;
+        }
+
+        if (member.id === interaction.user.id) {
+            return await interaction.reply({
+                content: 'You cannot warn yourself.',
+                ephemeral: true,
+            });
         }
 
         try {
