@@ -52,7 +52,7 @@ export const buttonHandler: Handler = (client) => {
         const button = buttonMap.get(data.id);
         if (!button) return;
         if (!button.args) throw error('No args set in button');
-        const parsedArgs = button.args.parse(args);
+        const parsedArgs = button.args.parse ? button.args.parse(args) : null;
         if (!button._onPress) return;
         button._onPress(interaction, parsedArgs);
     });
