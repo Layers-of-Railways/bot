@@ -1,4 +1,10 @@
-import { EmbedBuilder, Events, inlineCode } from 'discord.js';
+import {
+    ButtonStyle,
+    EmbedBuilder,
+    Events,
+    Message,
+    inlineCode,
+} from 'discord.js';
 
 // log providers
 import logProviders from '../logProviders/_logProviders';
@@ -6,6 +12,9 @@ import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
 
 import { Handler } from '..';
 import { Log } from '../logs/Log';
+import { Button } from './button.handler';
+import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
+import { nullType } from 'valibot';
 
 export type LogAnalyzer = (
     url: string
@@ -49,25 +58,70 @@ async function findIssues(log: Log) {
     return issues;
 }
 
+const getLogText = async (message: Message) => {
+    const attachment = message.attachments.find(
+        (attachment) => attachment.contentType == 'text/plain; charset=utf-8'
+    );
+
+    if (!message.content && !attachment) return;
+    if (!message.channel.isTextBased()) return;
+
+    if (message.author === message.client.user) return;
+
+    return attachment
+        ? await (await fetch(attachment.url)).text()
+        : await parseWebLog(message.content);
+};
+
+const uploadButton = new Button(
+    'uploadmclogs',
+    nullType(),
+    async (interaction) => {
+        if (!interaction.message.reference?.messageId) return;
+        const message = interaction.channel?.messages.cache.get(
+            interaction.message.reference?.messageId
+        );
+        if (!message) return;
+        const log = await getLogText(message);
+        if (!log) return;
+        const res = await fetch('https://api.mclo.gs/1/log', {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `content=${encodeURIComponent(log)}`,
+            method: 'POST',
+        });
+        const data = await res.json();
+        if (!data.success)
+            return interaction.reply({
+                ephemeral: true,
+                content: "couldn't upload to mclo.gs",
+            });
+        interaction.reply({
+            embeds: [
+                new EmbedBuilder({
+                    title: 'Uploaded to mclo.gs',
+                    url: data.url,
+                    description: `id: ${data.id}`,
+                }),
+            ],
+        });
+    }
+);
+
 export const logHandler: Handler = (client) => {
     client.on(Events.MessageCreate, async (message) => {
+        if (message.author.id == message.client.user.id) return;
         try {
             if (message.channel.partial) await message.channel.fetch();
             if (message.author.partial) await message.author.fetch();
+
+            const log = await getLogText(message);
 
             const attachment = message.attachments.find(
                 (attachment) =>
                     attachment.contentType == 'text/plain; charset=utf-8'
             );
-
-            if (!message.content && !attachment) return;
-            if (!message.channel.isTextBased()) return;
-
-            if (message.author === client.user) return;
-
-            const log = attachment
-                ? await (await fetch(attachment.url)).text()
-                : await parseWebLog(message.content);
 
             if (!log) return;
 
@@ -171,8 +225,21 @@ export const logHandler: Handler = (client) => {
 
             const issues = await findIssues(parsedLog);
 
+            const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                uploadButton.button(
+                    {
+                        style: ButtonStyle.Secondary,
+                        label: 'Upload to mclo.gs',
+                    },
+                    null
+                )
+            );
+
             if (!issues.length) {
-                message.reply({ embeds: [logInfoEmbed] });
+                message.reply({
+                    embeds: [logInfoEmbed],
+                    components: attachment ? [row] : undefined,
+                });
                 return;
             }
 
@@ -186,7 +253,11 @@ export const logHandler: Handler = (client) => {
                 .setFields(...issues)
                 .setColor('Red');
 
-            message.reply({ embeds: [logInfoEmbed, issuesEmbed] });
+            console.log(attachment);
+            message.reply({
+                embeds: [logInfoEmbed, issuesEmbed],
+                components: attachment ? [row] : undefined,
+            });
             return;
         } catch (error) {
             console.error('Unhandled exception on MessageCreate', error);
