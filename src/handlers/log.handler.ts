@@ -97,14 +97,16 @@ const uploadButton = new Button(
                 ephemeral: true,
                 content: "couldn't upload to mclo.gs",
             });
-        interaction.reply({
+        interaction.message.edit({
             embeds: [
+                ...interaction.message.embeds,
                 new EmbedBuilder({
                     title: 'Uploaded to mclo.gs',
                     url: data.url,
                     description: `id: ${data.id}`,
                 }),
             ],
+            components: [],
         });
     }
 );
