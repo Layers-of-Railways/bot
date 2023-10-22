@@ -13,6 +13,7 @@ import { reloadGlobalSlashCommands } from './handlers/command.handler';
 import './webserver';
 import { buttonHandler } from './handlers/button.handler';
 import textCommandHandler from './handlers/textCommand.handler';
+import * as color from 'colorette';
 
 export const client = new Client({
     intents: [
@@ -28,8 +29,12 @@ export const client = new Client({
     partials: [Partials.Channel],
 });
 
-client.once(Events.ClientReady, async () => {
-    console.log('Discord bot ready!');
+client.once(Events.ClientReady, async (client) => {
+    console.log(
+        `Logged in as ${color.cyanBright(client.user.tag)} ${color.gray(
+            `<@${client.user.id}>`
+        )}`
+    );
 
     if (process.env.LOGS_CHANNEL) {
         const logsChannel = await client.channels.fetch(
