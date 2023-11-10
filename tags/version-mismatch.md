@@ -1,6 +1,6 @@
 ---
 title: Mismatched Versions
-color: Ref
+color: Red
 aliases: ['updatecreate', 'updatesnr', 'mismatch']
 ---
 
