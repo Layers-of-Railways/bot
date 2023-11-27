@@ -14,7 +14,11 @@ const WEBHOOK_SECRET: string = process.env.GITHUB_SECRET;
 const commitMap = new Map<string, Commit>();
 const githubMap = new Map<number, string>();
 
-export const handleWebhook = (client: Client, req: Request, res: Response) => {
+export const handleGithubWebhook = (
+    client: Client,
+    req: Request,
+    res: Response
+) => {
     if (!verify_signature(req)) {
         res.status(401).send('Unauthorized');
         return;
