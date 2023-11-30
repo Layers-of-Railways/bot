@@ -17,4 +17,3 @@ Where to find your logs:
 **»** [macOS](https://fabricmc.net/wiki/player:tutorials:logs_ml:mac)
 
 _Credit to the Fabric Community discord for these instructions._
-
