@@ -1,14 +1,21 @@
 import { Request, Response } from 'express';
-import { ActionRow, ButtonStyle, Client, Colors, EmbedBuilder } from 'discord.js';
+import { ButtonStyle, Client, Colors, EmbedBuilder } from 'discord.js';
 import { Button } from '../handlers/button.handler';
-import { string, object } from 'valibot'
+import { string, object } from 'valibot';
 import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 
-const banButton = new Button('Ban', object({userId: string()}), (interaction, data) => {
-    const reason = "aero banshare: " + (interaction.message.embeds[0].fields[3].value ?? "no reason provided")
-    interaction.guild?.bans.create(data.userId, { reason: reason });
-    interaction.reply(`<@${data.userId}> (\`${data.userId}\`) was banned.`)
-});
+const banButton = new Button(
+    'Ban',
+    object({ userId: string() }),
+    (interaction, data) => {
+        const reason =
+            'aero banshare: ' +
+            (interaction.message.embeds[0].fields[3].value ??
+                'no reason provided');
+        interaction.guild?.bans.create(data.userId, { reason: reason });
+        interaction.reply(`<@${data.userId}> (\`${data.userId}\`) was banned.`);
+    }
+);
 
 export const handleBanShare = (client: Client, req: Request, res: Response) => {
     if (!verify_signature(req)) {
@@ -53,12 +60,21 @@ const handleBan = async (client: Client, req: Request) => {
         )
         .setColor(Colors.Red)
         .setTimestamp();
-    channel?.isTextBased() && (await channel.send({ embeds: [embed], components: [
-        new ActionRowBuilder<ButtonBuilder>().addComponents(banButton.button({
-            label: "Ban",
-            style: ButtonStyle.Danger
-        }, {userId}))
-    ] }));
+    channel?.isTextBased() &&
+        (await channel.send({
+            embeds: [embed],
+            components: [
+                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    banButton.button(
+                        {
+                            label: 'Ban',
+                            style: ButtonStyle.Danger,
+                        },
+                        { userId }
+                    )
+                ),
+            ],
+        }));
 };
 
 const verify_signature = (req: Request) => {
