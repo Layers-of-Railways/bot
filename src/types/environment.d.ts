@@ -16,6 +16,7 @@ declare global {
             WEBSERVER_PORT: string;
             DATABASE_URL: string;
             SIMULATED_BAN_SHARE_KEY: string;
+            SIMULATED_BAN_SHARE_LOGS_CHANNEL: string;
             NODE_ENV: 'development' | 'dev-prod' | 'production';
         }
     }
