@@ -38,7 +38,9 @@ export const handleBanShare = (client: Client, req: Request, res: Response) => {
 };
 
 const handleBan = async (client: Client, req: Request) => {
-    const channel = client.channels.cache.get(process.env.SIMULATED_BAN_SHARE_LOGS_CHANNEL);
+    const channel = client.channels.cache.get(
+        process.env.SIMULATED_BAN_SHARE_LOGS_CHANNEL
+    );
     const server = req.body.server;
     const userId = req.body.userid;
     const reason = req.body.reason;
