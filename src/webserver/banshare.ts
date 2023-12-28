@@ -9,24 +9,40 @@ import {
     ModalBuilder,
     ModalActionRowComponentBuilder,
     TextInputBuilder,
+    PermissionsBitField,
+    TextInputStyle,
+    GuildMember,
 } from 'discord.js';
 import { Button } from '../handlers/button.handler';
 
 const banButton = new Button(
     'ban',
     async (interaction, data: { userId: string }) => {
+        const user = await interaction.client.users.fetch(data.userId)
+        if (
+            !(interaction.member as GuildMember)?.permissions.has(
+                PermissionsBitField.Flags.BanMembers
+            )
+        ) {
+            return await interaction.reply({
+                content: 'You do not have permission to ban this user',
+                ephemeral: true,
+            });
+        }
         const reason =
-            'simulated banshare: ' +
-            (interaction.message.embeds[0].fields[3].value ??
+            'Simulated Ban share: ' +
+            (interaction.message.embeds[0].fields[4].value ??
                 'no reason provided');
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
-            .setTitle(`Ban <@${data.userId}>`)
+            .setTitle(`Ban ${user.username}`)
+            
             .addComponents(
                 new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                     new TextInputBuilder()
                         .setCustomId('banReason')
                         .setLabel('Ban reason')
+                        .setStyle(TextInputStyle.Paragraph)
                         .setValue(reason)
                 )
             );
@@ -41,15 +57,16 @@ const banButton = new Button(
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
                 });
-                await interaction.reply({
+                await modalResponse.reply({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
                     ephemeral: true,
                 });
-                await interaction.update({
+                await interaction.message.edit({
                     components: [
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
                             new ButtonBuilder()
-                                .setLabel('ban')
+                                .setCustomId('fakeBanButton')
+                                .setLabel('Ban')
                                 .setStyle(ButtonStyle.Danger)
                                 .setDisabled(true)
                         ),
@@ -141,6 +158,7 @@ const handleBan = async (client: Client, req: Request) => {
                         {
                             label: 'Ban',
                             style: ButtonStyle.Danger,
+                            disabled: guildMember ? !guildMember.bannable : false
                         },
                         { userId }
                     )
