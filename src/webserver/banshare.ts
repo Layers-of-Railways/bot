@@ -14,7 +14,7 @@ import { Button } from '../handlers/button.handler';
 
 const banButton = new Button(
     'ban',
-    async (interaction, data:{userId:string}) => {
+    async (interaction, data: { userId: string }) => {
         const reason =
             'aero banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
