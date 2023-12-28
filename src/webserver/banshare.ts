@@ -11,12 +11,10 @@ import {
     TextInputBuilder,
 } from 'discord.js';
 import { Button } from '../handlers/button.handler';
-import { string, object } from 'valibot';
 
 const banButton = new Button(
     'ban',
-    object({ userId: string() }),
-    async (interaction, data) => {
+    async (interaction, data:{userId:string}) => {
         const reason =
             'aero banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
