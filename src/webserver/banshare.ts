@@ -1,19 +1,46 @@
 import { Request, Response } from 'express';
-import { ButtonStyle, Client, Colors, EmbedBuilder } from 'discord.js';
+import {
+    ButtonStyle,
+    Client,
+    Colors,
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ModalBuilder,
+    ModalActionRowComponentBuilder,
+    TextInputBuilder,
+} from 'discord.js';
 import { Button } from '../handlers/button.handler';
 import { string, object } from 'valibot';
-import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
 
 const banButton = new Button(
-    'Ban',
+    'ban',
     object({ userId: string() }),
-    (interaction, data) => {
-        const reason =
+    async (interaction, data) => {
+        let reason =
             'aero banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
                 'no reason provided');
-        interaction.guild?.bans.create(data.userId, { reason: reason });
-        interaction.reply(`<@${data.userId}> (\`${data.userId}\`) was banned.`);
+        const modal = new ModalBuilder()
+            .setCustomId(`ban`)
+            .setTitle(`Ban <@${data.userId}>`)
+            .addComponents(
+                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('banReason')
+                        .setLabel('Ban reason')
+                        .setValue(reason)
+                )
+            );
+        interaction.showModal(modal)
+        interaction.awaitModalSubmit({
+            filter: interaction => interaction.customId == modal.data.custom_id,
+            time: 300_000
+        }).then(modalResponse => {
+            interaction.guild?.bans.create(data.userId, { reason: modalResponse.components[0].components[0].value });
+            interaction.reply(`<@${data.userId}> (\`${data.userId}\`) was banned.`);
+        })
+        
     }
 );
 
