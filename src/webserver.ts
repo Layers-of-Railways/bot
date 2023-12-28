@@ -1,6 +1,7 @@
 import express from 'express';
-import { handleWebhook } from './webserver/github';
+import { handleGithubWebhook } from './webserver/github';
 import { client } from './index';
+import { handleBanShare } from './webserver/banshare';
 
 const app = express();
 
@@ -11,7 +12,11 @@ app.get('/', function (req, res) {
 });
 
 app.post('/github-webhook', function (req, res) {
-    handleWebhook(client, req, res);
+    handleGithubWebhook(client, req, res);
+});
+
+app.post('/banshare', function (req, res) {
+    handleBanShare(client, req, res);
 });
 
 const port = process.env.WEBSERVER_PORT || 3000;

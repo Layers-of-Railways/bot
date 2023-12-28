@@ -1,14 +1,22 @@
 import { Analyzer } from '../handlers/log.handler';
 
 export const optifineAnalyzer: Analyzer = async (log) => {
-    const matchesOptifine = log.mods
-        ? log.mods.has('optifine')
-        : log.content.match(/f_174747_/);
+    const matchesOptifine = log.content.match(
+        /Optifine Has been detected, Disabled Warning Status: (true|false)/
+    );
+
     if (matchesOptifine) {
-        return {
-            name: 'Incompatible with OptiFine',
-            value: "OptiFine breaks Steam 'n' Rails and is Incompatible\n\nCheck `/tag optifine` for more info & alternatives you can use.",
-        };
+        if (matchesOptifine?.[1] == 'true') {
+            return {
+                name: 'Optifine Warning Disabled',
+                value: 'You appeared to have disabled the Optifine warning. Many issues you might encounter are caused by Optifine. You will most likely get any support due to this.',
+            };
+        } else {
+            return {
+                name: 'Incompatible with OptiFine',
+                value: "OptiFine breaks Steam 'n' Rails and is Incompatible\n\nCheck `/tag optifine` for more info & alternatives you can use.",
+            };
+        }
     }
     return null;
 };

@@ -28,13 +28,5 @@ export const createVersionAnalyzer: Analyzer = async (log) => {
         };
     }
 
-    // Steam 'n' Rails is currently incompatible with Create 0.5.1.e
-    // if (log.mods.get('create') == '0.5.1.e') {
-    //     return {
-    //         name: 'Incompatible with Create 0.5.1.e',
-    //         value: "Create: Steam 'n' Rails is currently incompatible with `Create 0.5.1.e`. 'Please downgrade to `Create 0.5.1.d` if you are are `1.20.1` or `Create 0.5.1c.c` if you are on `1.19.2`.",
-    //     };
-    // }
-
     return null;
 };
