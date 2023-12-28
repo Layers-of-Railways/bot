@@ -65,6 +65,7 @@ const banButton = new Button(
                     components: [
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
                             new ButtonBuilder()
+                                .setCustomId('fakeBanButton')
                                 .setLabel('ban')
                                 .setStyle(ButtonStyle.Danger)
                                 .setDisabled(true)
