@@ -7,6 +7,7 @@ import {
 } from 'discord.js';
 import { Handler } from '..';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buttonMap = new Map<string, Button<any>>();
 
 export class Button<ArgsType> {
@@ -14,10 +15,7 @@ export class Button<ArgsType> {
     _onPress?: (interaction: ButtonInteraction, args: ArgsType) => unknown;
     constructor(
         id: string,
-        onPress: (
-            interaction: ButtonInteraction,
-            args: ArgsType
-        ) => unknown
+        onPress: (interaction: ButtonInteraction, args: ArgsType) => unknown
     ) {
         this.id = id;
         if (buttonMap.has(id)) console.error(`Button ${id} is already defined`);
@@ -38,7 +36,7 @@ export class Button<ArgsType> {
 }
 
 export const buttonHandler: Handler = (client) => {
-    client.on(Events.InteractionCreate, async (interaction:Interaction) => {
+    client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         if (!interaction.isButton()) return;
         const data = JSON.parse(interaction.customId);
         const args = data.args;
@@ -48,10 +46,10 @@ export const buttonHandler: Handler = (client) => {
         if (!button) return;
 
         if (!button._onPress) return;
-        try{
+        try {
             button._onPress(interaction, args);
-        }catch{
-            interaction.reply("error while executing")
+        } catch {
+            interaction.reply('error while executing');
         }
     });
 };

@@ -15,14 +15,13 @@ import { Button } from '../handlers/button.handler';
 
 const banButton = new Button(
     'ban',
-    async (interaction, data:{userId:string}) => {
+    async (interaction, data: { userId: string }) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // .has exists, just ts doesnt believe it
         if (!interaction.member?.permissions.has(PermissionsBitField.Flags.BanMembers)) {
             return await interaction.reply({content: "You do not have permission to ban this user", ephemeral: true})
         }
-
         const reason =
             'simulated banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
