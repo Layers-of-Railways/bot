@@ -9,7 +9,7 @@ export const optifineAnalyzer: Analyzer = async (log) => {
         if (matchesOptifine?.[1] == 'true') {
             return {
                 name: 'Optifine Warning Disabled',
-                value: 'You appeared to have disabled the Optifine warning. Many issues you might encounter are caused by Optifine. You will most likely get any support due to this.',
+                value: 'You appeared to have disabled the Optifine warning. Many issues you might encounter are caused by Optifine. You will not get any support due to this.',
             };
         } else {
             return {
