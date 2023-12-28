@@ -18,7 +18,7 @@ import { Button } from './button.handler';
 
 const banButton = new Button(
     'ban-spammer',
-    async (interaction, data: { userId: string }) => {
+    async (interaction, data: { userId: string; reason: string }) => {
         const user = await interaction.client.users.fetch(data.userId);
         if (
             !(interaction.member as GuildMember)?.permissions.has(
@@ -41,7 +41,7 @@ const banButton = new Button(
                         .setCustomId('banReason')
                         .setLabel('Ban reason')
                         .setStyle(TextInputStyle.Paragraph)
-                        .setValue('spam (autodetected)')
+                        .setValue(`(autodetected)\n${data.reason}`)
                 )
             );
         await interaction.showModal(modal);
@@ -103,38 +103,48 @@ const banButton = new Button(
     }
 );
 
-const getMessageSuspicion = async (message: Message) => {
-    let suspicionLevel = 0;
+const getMessageSuspicions = async (message: Message) => {
+    let level = 0;
+    const reasons = new Set<string>();
     const links = message.content.matchAll(
         /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g
     );
-    if (message.content.toLowerCase().includes('nitro')) suspicionLevel += 5;
+    if (message.content.toLowerCase().includes('nitro')) level += 5;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const _ of links) suspicionLevel += 5;
+    for (const _ of links) level += 5;
 
     const invites = message.content.matchAll(
         /\s*(?:https:\/\/)?(?:discord\.gg\/|discord\.com\/invite\/)[a-zA-Z0-9]+\s*/g
     );
     for (const inviteLink of invites) {
         const invite = await message.client.fetchInvite(inviteLink[0]);
-        suspicionLevel += 10;
-        if (invite.guild?.name.includes('18')) suspicionLevel += 20;
+        level += 10;
+        if (invite.guild?.name.includes('18')) level += 20;
         if (
             invite.guild?.nsfwLevel == GuildNSFWLevel.Explicit ||
             invite.guild?.nsfwLevel == GuildNSFWLevel.AgeRestricted
-        )
-            suspicionLevel += 20;
+        ){
+            level += 20;
+            reasons.add("discord invites")
+        }
+        const phishGGData = await (
+            await fetch(`https://api.phish.gg/server?id=${invite.guild?.id}`)
+        ).json();
+        if (phishGGData.match) {
+            level += 100;
+            reasons.add(phishGGData.reason);
+        }
     }
-    return suspicionLevel;
+    return { level, reasons };
 };
 
 export const spamHandler: Handler = (client) => {
     client.on('messageCreate', async (message: Message) => {
-        let suspicionLevel = await getMessageSuspicion(message);
-        if (suspicionLevel > 10) {
+        const suspicion = await getMessageSuspicions(message);
+        if (suspicion.level > 10) {
             if (!message.inGuild()) return;
 
-            suspicionLevel += (
+            const otherSuspicions = (
                 await Promise.all(
                     (
                         await Promise.all(
@@ -153,9 +163,18 @@ export const spamHandler: Handler = (client) => {
                         )
                     )
                         .reduce((a, b) => a.concat(b))
-                        .map(getMessageSuspicion)
+                        .map(getMessageSuspicions)
                 )
-            ).reduce((a, b) => a + b);
+            ).reduce((a, b) => ({
+                level: a.level + b.level,
+                reasons: new Set(...a.reasons, ...b.reasons),
+            }));
+
+            suspicion.level += otherSuspicions.level;
+            suspicion.reasons = new Set(
+                ...suspicion.reasons,
+                otherSuspicions.reasons
+            );
 
             const logChannel = await message.guild?.channels.fetch(
                 process.env.MESSAGE_LOGS_CHANNEL
@@ -164,14 +183,23 @@ export const spamHandler: Handler = (client) => {
                 logChannel.send({
                     embeds: [
                         new EmbedBuilder({
-                            description: `suspicion level ${suspicionLevel} for ${message.author}, from message ${message.url}`,
+                            description: `suspicion level ${suspicion} for ${
+                                message.author
+                            }, from message ${message.url}\nreasons:${[
+                                ...suspicion.reasons.values(),
+                            ].join('\n')}`,
                         }),
                     ],
                     components: [
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
                             banButton.button(
                                 { label: 'Ban', style: ButtonStyle.Danger },
-                                { userId: message.author.id }
+                                {
+                                    userId: message.author.id,
+                                    reason: [
+                                        ...suspicion.reasons.values(),
+                                    ].join(),
+                                }
                             )
                         ),
                     ],
