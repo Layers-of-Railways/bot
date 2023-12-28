@@ -156,6 +156,7 @@ const handleBan = async (client: Client, req: Request) => {
                         {
                             label: 'Ban',
                             style: ButtonStyle.Danger,
+                            disabled: guildMember ? !guildMember.bannable : false
                         },
                         { userId }
                     )
