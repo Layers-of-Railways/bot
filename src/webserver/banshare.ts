@@ -11,17 +11,15 @@ import {
     TextInputBuilder,
     PermissionsBitField,
     TextInputStyle,
+    GuildMember,
 } from 'discord.js';
 import { Button } from '../handlers/button.handler';
 
 const banButton = new Button(
     'ban',
     async (interaction, data: { userId: string }) => {
-        // .has exists, just ts doesnt believe it
         if (
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            !interaction.member?.permissions.has(
+            !(interaction.member as GuildMember)?.permissions.has(
                 PermissionsBitField.Flags.BanMembers
             )
         ) {
