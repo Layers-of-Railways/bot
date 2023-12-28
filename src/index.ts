@@ -90,7 +90,7 @@ const handlers: Handler[] = [
     textCommandHandler,
     logHandler,
     buttonHandler,
-    spamHandler
+    spamHandler,
 ];
 
 for (const handler of handlers) {
