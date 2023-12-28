@@ -31,7 +31,7 @@ const banButton = new Button(
             });
         }
         const reason =
-            'simulated banshare: ' +
+            'Simulated Ban share: ' +
             (interaction.message.embeds[0].fields[4].value ??
                 'no reason provided');
         const modal = new ModalBuilder()
@@ -66,7 +66,7 @@ const banButton = new Button(
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
                             new ButtonBuilder()
                                 .setCustomId('fakeBanButton')
-                                .setLabel('ban')
+                                .setLabel('Ban')
                                 .setStyle(ButtonStyle.Danger)
                                 .setDisabled(true)
                         ),
