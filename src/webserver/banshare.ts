@@ -59,7 +59,7 @@ const banButton = new Button(
                 });
                 await interaction.followUp({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
-                    ephemeral: true
+                    ephemeral: true,
                 });
                 await interaction.update({
                     components: [
