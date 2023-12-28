@@ -158,7 +158,7 @@ export const spamHandler: Handler = (client) => {
             ).reduce((a, b) => a + b);
 
             const logChannel = await message.guild?.channels.fetch(
-                process.env.LOGS_CHANNEL
+                process.env.MESSAGE_LOGS_CHANNEL
             );
             if (logChannel?.isTextBased())
                 logChannel.send({
