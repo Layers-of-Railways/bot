@@ -57,11 +57,11 @@ const banButton = new Button(
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
                 });
-                await interaction.followUp({
+                await modalResponse.reply({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
                     ephemeral: true,
                 });
-                await interaction.update({
+                await interaction.message.edit({
                     components: [
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
                             new ButtonBuilder()
