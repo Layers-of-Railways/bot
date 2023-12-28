@@ -32,7 +32,7 @@ const banButton = new Button(
         }
         const reason =
             'simulated banshare: ' +
-            (interaction.message.embeds[0].fields[3].value ??
+            (interaction.message.embeds[0].fields[4].value ??
                 'no reason provided');
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
@@ -57,9 +57,9 @@ const banButton = new Button(
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
                 });
-                await interaction.reply({
+                await interaction.followUp({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
-                    ephemeral: true,
+                    ephemeral: true
                 });
                 await interaction.update({
                     components: [
