@@ -29,10 +29,12 @@ const banButton = new Button(
                 ephemeral: true,
             });
         }
+        console.count() // 1
         const reason =
             'simulated banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
                 'no reason provided');
+        console.count() // 2
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
             .setTitle(`Ban <@${data.userId}>`)
@@ -44,7 +46,9 @@ const banButton = new Button(
                         .setValue(reason)
                 )
             );
+        console.count() // 3
         await interaction.showModal(modal);
+        console.count() // 4
         interaction
             .awaitModalSubmit({
                 filter: (interaction) =>
