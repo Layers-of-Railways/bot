@@ -19,7 +19,7 @@ import { Button } from './button.handler';
 const banButton = new Button(
     'ban-spammer',
     async (interaction, data: { userId: string }) => {
-        const user = await interaction.client.users.fetch(data.userId)
+        const user = await interaction.client.users.fetch(data.userId);
         if (
             !(interaction.member as GuildMember)?.permissions.has(
                 PermissionsBitField.Flags.BanMembers
@@ -34,14 +34,14 @@ const banButton = new Button(
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
             .setTitle(`Ban ${user.username}`)
-            
+
             .addComponents(
                 new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                     new TextInputBuilder()
                         .setCustomId('banReason')
                         .setLabel('Ban reason')
                         .setStyle(TextInputStyle.Paragraph)
-                        .setValue("spam (autodetected)")
+                        .setValue('spam (autodetected)')
                 )
             );
         await interaction.showModal(modal);
@@ -89,7 +89,12 @@ const banButton = new Button(
                                                 .components[0].value,
                                         },
                                     ])
-                                    .setAuthor({iconURL: interaction.user.avatar ?? undefined, name: interaction.user.username}),
+                                    .setAuthor({
+                                        iconURL:
+                                            interaction.user.avatar ??
+                                            undefined,
+                                        name: interaction.user.username,
+                                    }),
                             ],
                         });
                     }
@@ -163,8 +168,13 @@ export const spamHandler: Handler = (client) => {
                         }),
                     ],
                     components: [
-                        new ActionRowBuilder<ButtonBuilder>().addComponents(banButton.button({label: "Ban", style: ButtonStyle.Danger}, {userId: message.author.id}))
-                    ]
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            banButton.button(
+                                { label: 'Ban', style: ButtonStyle.Danger },
+                                { userId: message.author.id }
+                            )
+                        ),
+                    ],
                 });
         }
     });
