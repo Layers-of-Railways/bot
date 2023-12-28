@@ -20,7 +20,7 @@ const banButton = new Button(
         // @ts-ignore
         // .has exists, just ts doesnt believe it
         if (!interaction.member?.permissions.has(PermissionsBitField.Flags.BanMembers)) {
-            await interaction.reply({content: "You do not have permission to ban this user", ephemeral: true})
+            return await interaction.reply({content: "You do not have permission to ban this user", ephemeral: true})
         }
 
         const reason =
