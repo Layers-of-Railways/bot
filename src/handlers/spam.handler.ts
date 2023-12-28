@@ -54,6 +54,7 @@ const banButton = new Button(
             .then(async (modalResponse) => {
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
+                    deleteMessageSeconds: 3600*3
                 });
                 await modalResponse.reply({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
