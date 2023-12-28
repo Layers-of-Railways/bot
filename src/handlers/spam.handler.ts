@@ -123,9 +123,9 @@ const getMessageSuspicions = async (message: Message) => {
         if (
             invite.guild?.nsfwLevel == GuildNSFWLevel.Explicit ||
             invite.guild?.nsfwLevel == GuildNSFWLevel.AgeRestricted
-        ){
+        ) {
             level += 20;
-            reasons.add("discord invites")
+            reasons.add('discord invites');
         }
         const phishGGData = await (
             await fetch(`https://api.phish.gg/server?id=${invite.guild?.id}`)
