@@ -18,7 +18,7 @@ import { Button } from '../handlers/button.handler';
 const banButton = new Button(
     'ban',
     async (interaction, data: { userId: string }) => {
-        const user = await interaction.client.users.fetch(data.userId)
+        const user = await interaction.client.users.fetch(data.userId);
         if (
             !(interaction.member as GuildMember)?.permissions.has(
                 PermissionsBitField.Flags.BanMembers
@@ -36,7 +36,7 @@ const banButton = new Button(
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
             .setTitle(`Ban ${user.username}`)
-            
+
             .addComponents(
                 new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                     new TextInputBuilder()
@@ -158,7 +158,9 @@ const handleBan = async (client: Client, req: Request) => {
                         {
                             label: 'Ban',
                             style: ButtonStyle.Danger,
-                            disabled: guildMember ? !guildMember.bannable : false
+                            disabled: guildMember
+                                ? !guildMember.bannable
+                                : false,
                         },
                         { userId }
                     )

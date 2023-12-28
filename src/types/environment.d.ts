@@ -8,6 +8,7 @@ declare global {
             SAY_LOGS_CHANNEL: string;
             LOGS_CHANNEL: string;
             BAN_LOGS_CHANNEL: string;
+            MESSAGE_LOGS_CHANNEL: string;
             MAVEN_REPO: string;
             GITHUB_STATUS_CHANNEL: string;
             GITHUB_SECRET: string;
