@@ -3,28 +3,44 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
+    GuildMember,
     GuildNSFWLevel,
     Message,
     ModalActionRowComponentBuilder,
     ModalBuilder,
+    PermissionsBitField,
     TextBasedChannel,
     TextInputBuilder,
+    TextInputStyle,
 } from 'discord.js';
 import { Handler } from '..';
 import { Button } from './button.handler';
 
 const banButton = new Button(
-    'spammer-ban',
+    'ban-spammer',
     async (interaction, data: { userId: string }) => {
+        const user = await interaction.client.users.fetch(data.userId)
+        if (
+            !(interaction.member as GuildMember)?.permissions.has(
+                PermissionsBitField.Flags.BanMembers
+            )
+        ) {
+            return await interaction.reply({
+                content: 'You do not have permission to ban this user',
+                ephemeral: true,
+            });
+        }
 
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
-            .setTitle(`Ban <@${data.userId}>`)
+            .setTitle(`Ban ${user.username}`)
+            
             .addComponents(
                 new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                     new TextInputBuilder()
                         .setCustomId('banReason')
                         .setLabel('Ban reason')
+                        .setStyle(TextInputStyle.Paragraph)
                         .setValue("spam (autodetected)")
                 )
             );
@@ -39,15 +55,16 @@ const banButton = new Button(
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
                 });
-                await interaction.reply({
+                await modalResponse.reply({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
                     ephemeral: true,
                 });
-                await interaction.update({
+                await interaction.message.edit({
                     components: [
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
                             new ButtonBuilder()
-                                .setLabel('ban')
+                                .setCustomId('fakeBanButton')
+                                .setLabel('Ban')
                                 .setStyle(ButtonStyle.Danger)
                                 .setDisabled(true)
                         ),
@@ -61,7 +78,7 @@ const banButton = new Button(
                         channel.send({
                             embeds: [
                                 new EmbedBuilder()
-                                    .setTitle('User Banned via Banshare')
+                                    .setTitle('User Banned for spam')
                                     .setDescription(
                                         `<@!${data.userId}> was banned!`
                                     )
@@ -71,11 +88,8 @@ const banButton = new Button(
                                             value: modalResponse.components[0]
                                                 .components[0].value,
                                         },
-                                        {
-                                            name: 'By',
-                                            value: interaction.user.username,
-                                        },
-                                    ]),
+                                    ])
+                                    .setAuthor({iconURL: interaction.user.avatar ?? undefined, name: interaction.user.username}),
                             ],
                         });
                     }
@@ -138,7 +152,6 @@ export const spamHandler: Handler = (client) => {
                 )
             ).reduce((a, b) => a + b);
 
-            //TODO: consequences
             const logChannel = await message.guild?.channels.fetch(
                 process.env.LOGS_CHANNEL
             );
