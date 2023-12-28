@@ -32,15 +32,21 @@ const banButton = new Button(
                         .setValue(reason)
                 )
             );
-        interaction.showModal(modal)
-        interaction.awaitModalSubmit({
-            filter: interaction => interaction.customId == modal.data.custom_id,
-            time: 300_000
-        }).then(modalResponse => {
-            interaction.guild?.bans.create(data.userId, { reason: modalResponse.components[0].components[0].value });
-            interaction.reply(`<@${data.userId}> (\`${data.userId}\`) was banned.`);
-        })
-        
+        interaction.showModal(modal);
+        interaction
+            .awaitModalSubmit({
+                filter: (interaction) =>
+                    interaction.customId == modal.data.custom_id,
+                time: 300_000,
+            })
+            .then((modalResponse) => {
+                interaction.guild?.bans.create(data.userId, {
+                    reason: modalResponse.components[0].components[0].value,
+                });
+                interaction.reply(
+                    `<@${data.userId}> (\`${data.userId}\`) was banned.`
+                );
+            });
     }
 );
 
