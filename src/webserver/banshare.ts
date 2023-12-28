@@ -16,7 +16,7 @@ const banButton = new Button(
     'ban',
     async (interaction, data: { userId: string }) => {
         const reason =
-            'aero banshare: ' +
+            'simulated banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
                 'no reason provided');
         const modal = new ModalBuilder()
@@ -30,20 +30,58 @@ const banButton = new Button(
                         .setValue(reason)
                 )
             );
-        interaction.showModal(modal);
+        await interaction.showModal(modal);
         interaction
             .awaitModalSubmit({
                 filter: (interaction) =>
                     interaction.customId == modal.data.custom_id,
                 time: 300_000,
             })
-            .then((modalResponse) => {
+            .then(async (modalResponse) => {
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
                 });
-                interaction.reply(
-                    `<@${data.userId}> (\`${data.userId}\`) was banned.`
-                );
+                await interaction.reply({
+                    content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
+                    ephemeral: true,
+                });
+                await interaction.update({
+                    components: [
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setLabel('ban')
+                                .setStyle(ButtonStyle.Danger)
+                                .setDisabled(true)
+                        ),
+                    ],
+                });
+                if (interaction.guild != null) {
+                    const channel = await interaction.guild.channels.fetch(
+                        process.env.BAN_LOGS_CHANNEL
+                    );
+                    if (channel?.isTextBased()) {
+                        channel.send({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle('User Banned via Banshare')
+                                    .setDescription(
+                                        `<@!${data.userId}> was banned!`
+                                    )
+                                    .setFields([
+                                        {
+                                            name: 'Reason',
+                                            value: modalResponse.components[0]
+                                                .components[0].value,
+                                        },
+                                        {
+                                            name: 'By',
+                                            value: interaction.user.username,
+                                        },
+                                    ]),
+                            ],
+                        });
+                    }
+                }
             });
     }
 );
@@ -85,6 +123,7 @@ const handleBan = async (client: Client, req: Request) => {
     const embed = new EmbedBuilder()
         .setTitle(`Incoming ban from ${server}`)
         .addFields(
+            { name: 'User', value: `<@!${user.id}>` },
             { name: 'Username', value: user.username },
             { name: 'User ID', value: user.id },
             { name: 'Present in server', value: `${present}` },
