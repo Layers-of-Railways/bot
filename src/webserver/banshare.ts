@@ -18,6 +18,7 @@ import { Button } from '../handlers/button.handler';
 const banButton = new Button(
     'ban',
     async (interaction, data: { userId: string }) => {
+        const user = await interaction.client.users.fetch(data.userId)
         if (
             !(interaction.member as GuildMember)?.permissions.has(
                 PermissionsBitField.Flags.BanMembers
@@ -34,13 +35,14 @@ const banButton = new Button(
                 'no reason provided');
         const modal = new ModalBuilder()
             .setCustomId(`ban`)
-            .setTitle(`Ban <@${data.userId}>`)
+            .setTitle(`Ban ${user.username}`)
+            
             .addComponents(
                 new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                     new TextInputBuilder()
                         .setCustomId('banReason')
                         .setLabel('Ban reason')
-                        .setStyle(TextInputStyle.Short)
+                        .setStyle(TextInputStyle.Paragraph)
                         .setValue(reason)
                 )
             );
