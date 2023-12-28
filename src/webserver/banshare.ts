@@ -17,7 +17,7 @@ const banButton = new Button(
     'ban',
     object({ userId: string() }),
     async (interaction, data) => {
-        let reason =
+        const reason =
             'aero banshare: ' +
             (interaction.message.embeds[0].fields[3].value ??
                 'no reason provided');
