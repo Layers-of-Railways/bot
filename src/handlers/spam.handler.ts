@@ -184,7 +184,7 @@ export const spamHandler: Handler = (client) => {
                 logChannel.send({
                     embeds: [
                         new EmbedBuilder({
-                            description: `suspicion level ${suspicion} for ${
+                            description: `suspicion level ${suspicion.level} for ${
                                 message.author
                             }, from message ${message.url}\nreasons:${[
                                 ...suspicion.reasons.values(),
@@ -197,9 +197,10 @@ export const spamHandler: Handler = (client) => {
                                 { label: 'Ban', style: ButtonStyle.Danger },
                                 {
                                     userId: message.author.id,
-                                    reason: [
-                                        ...suspicion.reasons.values(),
-                                    ].join(),
+                                    reason: "spam" //TODO: fix the reasons once button accepts longer params
+                                    // [
+                                    //     ...suspicion.reasons.values(),
+                                    // ].join(),
                                 }
                             )
                         ),
