@@ -173,7 +173,10 @@ export const spamHandler: Handler = (client) => {
             }));
 
             suspicion.level += otherSuspicions.level;
-            suspicion.reasons = new Set([...suspicion.reasons, ...otherSuspicions.reasons]);
+            suspicion.reasons = new Set([
+                ...suspicion.reasons,
+                ...otherSuspicions.reasons,
+            ]);
 
             const logChannel = await message.guild?.channels.fetch(
                 process.env.MESSAGE_LOGS_CHANNEL
