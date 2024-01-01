@@ -120,13 +120,14 @@ const getMessageSuspicions = async (message: Message) => {
     for (const inviteLink of invites) {
         const invite = await message.client.fetchInvite(inviteLink[0]);
         level += 10;
+        reasons.add('discord invites');
         if (invite.guild?.name.includes('18')) level += 20;
         if (
             invite.guild?.nsfwLevel == GuildNSFWLevel.Explicit ||
             invite.guild?.nsfwLevel == GuildNSFWLevel.AgeRestricted
         ) {
             level += 20;
-            reasons.add('discord invites');
+            reasons.add('18+ discord invites');
         }
         const phishGGData = await (
             await fetch(`https://api.phish.gg/server?id=${invite.guild?.id}`)
