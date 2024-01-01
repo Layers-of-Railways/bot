@@ -169,14 +169,11 @@ export const spamHandler: Handler = (client) => {
                 )
             ).reduce((a, b) => ({
                 level: a.level + b.level,
-                reasons: new Set(...a.reasons, ...b.reasons),
+                reasons: new Set([...a.reasons, ...b.reasons]),
             }));
 
             suspicion.level += otherSuspicions.level;
-            suspicion.reasons = new Set(
-                ...suspicion.reasons,
-                otherSuspicions.reasons
-            );
+            suspicion.reasons = new Set([...suspicion.reasons, ...otherSuspicions.reasons]);
 
             const logChannel = await message.guild?.channels.fetch(
                 process.env.MESSAGE_LOGS_CHANNEL
@@ -189,7 +186,7 @@ export const spamHandler: Handler = (client) => {
                                 suspicion.level
                             } for ${message.author}, from message ${
                                 message.url
-                            }\nreasons:${[...suspicion.reasons.values()].join(
+                            }\nreasons:\n${[...suspicion.reasons.values()].join(
                                 '\n'
                             )}`,
                         }),
