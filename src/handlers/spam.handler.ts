@@ -54,7 +54,7 @@ const banButton = new Button(
             .then(async (modalResponse) => {
                 interaction.guild?.bans.create(data.userId, {
                     reason: modalResponse.components[0].components[0].value,
-                    deleteMessageSeconds: 3600*3
+                    deleteMessageSeconds: 3600 * 3,
                 });
                 await modalResponse.reply({
                     content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
@@ -184,11 +184,13 @@ export const spamHandler: Handler = (client) => {
                 logChannel.send({
                     embeds: [
                         new EmbedBuilder({
-                            description: `suspicion level ${suspicion.level} for ${
-                                message.author
-                            }, from message ${message.url}\nreasons:${[
-                                ...suspicion.reasons.values(),
-                            ].join('\n')}`,
+                            description: `suspicion level ${
+                                suspicion.level
+                            } for ${message.author}, from message ${
+                                message.url
+                            }\nreasons:${[...suspicion.reasons.values()].join(
+                                '\n'
+                            )}`,
                         }),
                     ],
                     components: [
@@ -197,7 +199,7 @@ export const spamHandler: Handler = (client) => {
                                 { label: 'Ban', style: ButtonStyle.Danger },
                                 {
                                     userId: message.author.id,
-                                    reason: "spam" //TODO: fix the reasons once button accepts longer params
+                                    reason: 'spam', //TODO: fix the reasons once button accepts longer params
                                     // [
                                     //     ...suspicion.reasons.values(),
                                     // ].join(),
