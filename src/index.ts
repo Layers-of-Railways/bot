@@ -13,7 +13,7 @@ import { reloadGlobalSlashCommands } from './handlers/command.handler';
 import './webserver';
 import { buttonHandler } from './handlers/button.handler';
 import textCommandHandler from './handlers/textCommand.handler';
-import { spamHandler } from './handlers/spam.handler';
+// import { spamHandler } from './handlers/spam.handler';
 
 export const client = new Client({
     intents: [
@@ -90,7 +90,7 @@ const handlers: Handler[] = [
     textCommandHandler,
     logHandler,
     buttonHandler,
-    spamHandler,
+    // spamHandler,
 ];
 
 for (const handler of handlers) {
