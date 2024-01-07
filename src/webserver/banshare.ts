@@ -135,7 +135,6 @@ const handleBan = async (client: Client, req: Request) => {
 
     const guild = client.guilds.cache.get(process.env.SERVER_ID);
     const guildMember = await guild?.members.fetch(userId);
-    const present = guildMember !== undefined;
 
     const embed = new EmbedBuilder()
         .setTitle(`Incoming ban from ${server}`)
@@ -143,7 +142,6 @@ const handleBan = async (client: Client, req: Request) => {
             { name: 'User', value: `<@!${user.id}>` },
             { name: 'Username', value: user.username },
             { name: 'User ID', value: user.id },
-            { name: 'Present in server', value: `${present}` },
             { name: 'Reason', value: reason },
             { name: 'Banned From', value: server }
         )
