@@ -11,8 +11,8 @@ import { Handler } from '..';
 const buttonMap = new Map<string, Button<any>>();
 
 export class Button<ArgsType> {
-    id: string;
-    _onPress?: (interaction: ButtonInteraction, args: ArgsType) => unknown;
+    readonly id: string;
+    onPress: (interaction: ButtonInteraction, args: ArgsType) => unknown;
     constructor(
         id: string,
         onPress: (interaction: ButtonInteraction, args: ArgsType) => unknown
@@ -20,11 +20,11 @@ export class Button<ArgsType> {
         this.id = id;
         if (buttonMap.has(id)) console.error(`Button ${id} is already defined`);
         buttonMap.set(id, this);
-        this._onPress = onPress;
+        this.onPress = onPress;
     }
 
     button(
-        data: Partial<InteractionButtonComponentData>,
+        data: Omit<InteractionButtonComponentData, 'customId' | 'type'>,
         args: ArgsType
     ): ButtonBuilder {
         const button = new ButtonBuilder({
@@ -45,9 +45,9 @@ export const buttonHandler: Handler = (client) => {
         const button = buttonMap.get(data.id);
         if (!button) return;
 
-        if (!button._onPress) return;
+        if (!button.onPress) return;
         try {
-            button._onPress(interaction, args);
+            button.onPress(interaction, args);
         } catch {
             interaction.reply('error while executing');
         }
