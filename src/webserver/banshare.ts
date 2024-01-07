@@ -69,7 +69,7 @@ const banModal = new Modal(
 );
 
 const banButton = new Button(
-    'ban',
+    'ban-banshare',
     async (interaction, data: { userId: string }) => {
         const user = await interaction.client.users.fetch(data.userId);
         if (
