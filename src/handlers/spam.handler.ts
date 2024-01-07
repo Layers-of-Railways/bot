@@ -7,7 +7,6 @@ import {
     GuildNSFWLevel,
     Message,
     ModalActionRowComponentBuilder,
-    ModalBuilder,
     PermissionsBitField,
     TextBasedChannel,
     TextInputBuilder,
@@ -15,6 +14,61 @@ import {
 } from 'discord.js';
 import { Handler } from '..';
 import { Button } from './button.handler';
+import { Modal } from './modal.handler';
+
+const banModal = new Modal(
+    'ban-spammer',
+    async (interaction, data: { userId: string; reason: string }) => {
+        interaction.guild?.bans.create(data.userId, {
+            reason: interaction.components[0].components[0].value,
+            deleteMessageSeconds: 3600 * 3,
+        });
+        await interaction.reply({
+            content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
+            ephemeral: true,
+        });
+        if (interaction.message) {
+            await interaction.message.edit({
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('fakeBanButton')
+                            .setLabel('Ban')
+                            .setStyle(ButtonStyle.Danger)
+                            .setDisabled(true)
+                    ),
+                ],
+            });
+        }
+        if (interaction.guild != null) {
+            const channel = await interaction.guild.channels.fetch(
+                process.env.BAN_LOGS_CHANNEL
+            );
+            if (channel?.isTextBased()) {
+                channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle('User Banned for spam')
+                            .setDescription(`<@!${data.userId}> was banned!`)
+                            .setFields([
+                                {
+                                    name: 'Reason',
+                                    value: interaction.components[0]
+                                        .components[0].value,
+                                },
+                            ])
+                            .setAuthor({
+                                iconURL:
+                                    interaction.user.avatarURL({ size: 32 }) ??
+                                    undefined,
+                                name: interaction.user.username,
+                            }),
+                    ],
+                });
+            }
+        }
+    }
+);
 
 const banButton = new Button(
     'ban-spammer',
@@ -31,76 +85,23 @@ const banButton = new Button(
             });
         }
 
-        const modal = new ModalBuilder()
-            .setCustomId(`ban`)
-            .setTitle(`Ban ${user.username}`)
+        const modal = banModal.modal(
+            {
+                title: `Ban ${user.username}`,
+                components: [
+                    new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('banReason')
+                            .setLabel('Ban reason')
+                            .setStyle(TextInputStyle.Paragraph)
+                            .setValue(`(autodetected)\n${data.reason}`)
+                    ),
+                ],
+            },
+            { reason: data.reason, userId: data.userId }
+        );
 
-            .addComponents(
-                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('banReason')
-                        .setLabel('Ban reason')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setValue(`(autodetected)\n${data.reason}`)
-                )
-            );
         await interaction.showModal(modal);
-        interaction
-            .awaitModalSubmit({
-                filter: (interaction) =>
-                    interaction.customId == modal.data.custom_id,
-                time: 300_000,
-            })
-            .then(async (modalResponse) => {
-                interaction.guild?.bans.create(data.userId, {
-                    reason: modalResponse.components[0].components[0].value,
-                    deleteMessageSeconds: 3600 * 3,
-                });
-                await modalResponse.reply({
-                    content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
-                    ephemeral: true,
-                });
-                await interaction.message.edit({
-                    components: [
-                        new ActionRowBuilder<ButtonBuilder>().addComponents(
-                            new ButtonBuilder()
-                                .setCustomId('fakeBanButton')
-                                .setLabel('Ban')
-                                .setStyle(ButtonStyle.Danger)
-                                .setDisabled(true)
-                        ),
-                    ],
-                });
-                if (interaction.guild != null) {
-                    const channel = await interaction.guild.channels.fetch(
-                        process.env.BAN_LOGS_CHANNEL
-                    );
-                    if (channel?.isTextBased()) {
-                        channel.send({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setTitle('User Banned for spam')
-                                    .setDescription(
-                                        `<@!${data.userId}> was banned!`
-                                    )
-                                    .setFields([
-                                        {
-                                            name: 'Reason',
-                                            value: modalResponse.components[0]
-                                                .components[0].value,
-                                        },
-                                    ])
-                                    .setAuthor({
-                                        iconURL:
-                                            interaction.user.avatar ??
-                                            undefined,
-                                        name: interaction.user.username,
-                                    }),
-                            ],
-                        });
-                    }
-                }
-            });
     }
 );
 
@@ -118,23 +119,29 @@ const getMessageSuspicions = async (message: Message) => {
         /\s*(?:https:\/\/)?(?:discord\.gg\/|discord\.com\/invite\/)[a-zA-Z0-9]+\s*/g
     );
     for (const inviteLink of invites) {
-        const invite = await message.client.fetchInvite(inviteLink[0]);
-        level += 10;
-        reasons.add('discord invites');
-        if (invite.guild?.name.includes('18')) level += 20;
-        if (
-            invite.guild?.nsfwLevel == GuildNSFWLevel.Explicit ||
-            invite.guild?.nsfwLevel == GuildNSFWLevel.AgeRestricted
-        ) {
-            level += 20;
-            reasons.add('18+ discord invites');
-        }
-        const phishGGData = await (
-            await fetch(`https://api.phish.gg/server?id=${invite.guild?.id}`)
-        ).json();
-        if (phishGGData.match) {
-            level += 100;
-            reasons.add(phishGGData.reason);
+        try {
+            const invite = await message.client.fetchInvite(inviteLink[0]);
+            level += 10;
+            reasons.add('discord invites');
+            if (invite.guild?.name.includes('18')) level += 20;
+            if (
+                invite.guild?.nsfwLevel == GuildNSFWLevel.Explicit ||
+                invite.guild?.nsfwLevel == GuildNSFWLevel.AgeRestricted
+            ) {
+                level += 20;
+                reasons.add('18+ discord invites');
+            }
+            const phishGGData = await (
+                await fetch(
+                    `https://api.phish.gg/server?id=${invite.guild?.id}`
+                )
+            ).json();
+            if (phishGGData.match) {
+                level += 100;
+                reasons.add(phishGGData.reason);
+            }
+        } catch {
+            /* empty */
         }
     }
     return { level, reasons };
