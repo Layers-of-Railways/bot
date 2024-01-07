@@ -6,7 +6,6 @@ import {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
-    ModalBuilder,
     ModalActionRowComponentBuilder,
     TextInputBuilder,
     PermissionsBitField,
@@ -14,6 +13,60 @@ import {
     GuildMember,
 } from 'discord.js';
 import { Button } from '../handlers/button.handler';
+import { Modal } from '../handlers/modal.handler';
+
+const banModal = new Modal(
+    'ban-banshare',
+    async (interaction, data: { userId: string; reason: string }) => {
+        interaction.guild?.bans.create(data.userId, {
+            reason: interaction.components[0].components[0].value,
+        });
+        await interaction.reply({
+            content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
+            ephemeral: true,
+        });
+        if (interaction.message) {
+            await interaction.message.edit({
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('fakeBanButton')
+                            .setLabel('Ban')
+                            .setStyle(ButtonStyle.Danger)
+                            .setDisabled(true)
+                    ),
+                ],
+            });
+        }
+        if (interaction.guild != null) {
+            const channel = await interaction.guild.channels.fetch(
+                process.env.BAN_LOGS_CHANNEL
+            );
+            if (channel?.isTextBased()) {
+                channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle('User Banned via Banshare')
+                            .setDescription(`<@!${data.userId}> was banned!`)
+                            .setFields([
+                                {
+                                    name: 'Reason',
+                                    value: interaction.components[0]
+                                        .components[0].value,
+                                },
+                            ])
+                            .setAuthor({
+                                name: interaction.user.username,
+                                iconURL:
+                                    interaction.user.avatarURL({ size: 32 }) ??
+                                    undefined,
+                            }),
+                    ],
+                });
+            }
+        }
+    }
+);
 
 const banButton = new Button(
     'ban',
@@ -33,73 +86,23 @@ const banButton = new Button(
             'Simulated Ban share: ' +
             (interaction.message.embeds[0].fields[4].value ??
                 'no reason provided');
-        const modal = new ModalBuilder()
-            .setCustomId(`ban`)
-            .setTitle(`Ban ${user.username}`)
+        const modal = banModal.modal(
+            {
+                title: `Ban ${user.username}`,
+                components: [
+                    new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+                        new TextInputBuilder()
+                            .setCustomId('banReason')
+                            .setLabel('Ban reason')
+                            .setStyle(TextInputStyle.Paragraph)
+                            .setValue(reason)
+                    ),
+                ],
+            },
+            { reason: reason, userId: data.userId }
+        );
 
-            .addComponents(
-                new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('banReason')
-                        .setLabel('Ban reason')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setValue(reason)
-                )
-            );
         await interaction.showModal(modal);
-        interaction
-            .awaitModalSubmit({
-                filter: (interaction) =>
-                    interaction.customId == modal.data.custom_id,
-                time: 300_000,
-            })
-            .then(async (modalResponse) => {
-                interaction.guild?.bans.create(data.userId, {
-                    reason: modalResponse.components[0].components[0].value,
-                });
-                await modalResponse.reply({
-                    content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
-                    ephemeral: true,
-                });
-                await interaction.message.edit({
-                    components: [
-                        new ActionRowBuilder<ButtonBuilder>().addComponents(
-                            new ButtonBuilder()
-                                .setCustomId('fakeBanButton')
-                                .setLabel('Ban')
-                                .setStyle(ButtonStyle.Danger)
-                                .setDisabled(true)
-                        ),
-                    ],
-                });
-                if (interaction.guild != null) {
-                    const channel = await interaction.guild.channels.fetch(
-                        process.env.BAN_LOGS_CHANNEL
-                    );
-                    if (channel?.isTextBased()) {
-                        channel.send({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setTitle('User Banned via Banshare')
-                                    .setDescription(
-                                        `<@!${data.userId}> was banned!`
-                                    )
-                                    .setFields([
-                                        {
-                                            name: 'Reason',
-                                            value: modalResponse.components[0]
-                                                .components[0].value,
-                                        },
-                                        {
-                                            name: 'By',
-                                            value: interaction.user.username,
-                                        },
-                                    ]),
-                            ],
-                        });
-                    }
-                }
-            });
     }
 );
 
