@@ -95,7 +95,6 @@ const banButton = new Button(
                             .setCustomId('banReason')
                             .setLabel('Ban reason')
                             .setStyle(TextInputStyle.Paragraph)
-                            .setValue(reason)
                     ),
                 ],
             },
