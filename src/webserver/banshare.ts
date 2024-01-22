@@ -69,7 +69,8 @@ const banModal = new Modal(
                     });
                 }
             }
-        } catch {
+        } catch (error) {
+            console.error(error);
             await interaction.reply({
                 content: `Couldn't ban <@${data.userId}>`,
                 ephemeral: true,
