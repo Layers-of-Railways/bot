@@ -94,6 +94,11 @@ const banButton = new Button(
             });
         }
 
+        const reason =
+            'Simulated Ban share: ' +
+            (interaction.message.embeds[0].fields[4].value ??
+                'no reason provided');
+
         const modal = banModal.modal(
             {
                 title: `Ban ${user.username}`,
@@ -103,6 +108,7 @@ const banButton = new Button(
                             .setCustomId('banReason')
                             .setLabel('Ban reason')
                             .setStyle(TextInputStyle.Paragraph)
+                            .setValue(reason)
                     ),
                 ],
             },
