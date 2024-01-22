@@ -17,7 +17,7 @@ import { Modal } from '../handlers/modal.handler';
 
 const banModal = new Modal(
     'ban-banshare',
-    async (interaction, data: { userId: string; reason: string }) => {
+    async (interaction, data: { userId: string }) => {
         interaction.guild?.bans.create(data.userId, {
             reason: interaction.components[0].components[0].value,
         });
@@ -82,10 +82,7 @@ const banButton = new Button(
                 ephemeral: true,
             });
         }
-        const reason =
-            'Simulated Ban share: ' +
-            (interaction.message.embeds[0].fields[4].value ??
-                'no reason provided');
+
         const modal = banModal.modal(
             {
                 title: `Ban ${user.username}`,
@@ -98,7 +95,7 @@ const banButton = new Button(
                     ),
                 ],
             },
-            { reason: reason, userId: data.userId }
+            { userId: data.userId }
         );
 
         await interaction.showModal(modal);
