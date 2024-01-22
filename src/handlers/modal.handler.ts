@@ -40,6 +40,10 @@ export class Modal<ArgsType> {
 export const modalHandler: Handler = (client) => {
     client.on(Events.InteractionCreate, async (interaction) => {
         if (!interaction.isModalSubmit()) return;
+        console.log(
+            'recieved modal submit with custom id ',
+            interaction.customId
+        );
         const data = JSON.parse(interaction.customId);
         const args = data.args;
         if (!data.id) return;
