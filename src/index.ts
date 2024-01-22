@@ -13,6 +13,7 @@ import { reloadGlobalSlashCommands } from './handlers/command.handler';
 import './webserver';
 import { buttonHandler } from './handlers/button.handler';
 import textCommandHandler from './handlers/textCommand.handler';
+import { modalHandler } from './handlers/modal.handler';
 // import { spamHandler } from './handlers/spam.handler';
 
 export const client = new Client({
@@ -90,6 +91,7 @@ const handlers: Handler[] = [
     textCommandHandler,
     logHandler,
     buttonHandler,
+    modalHandler,
     // spamHandler,
 ];
 
