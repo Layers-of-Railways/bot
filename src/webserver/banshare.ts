@@ -18,52 +18,62 @@ import { Modal } from '../handlers/modal.handler';
 const banModal = new Modal(
     'ban-banshare',
     async (interaction, data: { userId: string }) => {
-        interaction.guild?.bans.create(data.userId, {
-            reason: interaction.components[0].components[0].value,
-        });
-        await interaction.reply({
-            content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
-            ephemeral: true,
-        });
-        if (interaction.message) {
-            await interaction.message.edit({
-                components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('fakeBanButton')
-                            .setLabel('Ban')
-                            .setStyle(ButtonStyle.Danger)
-                            .setDisabled(true)
-                    ),
-                ],
+        try {
+            await interaction.guild?.bans.create(data.userId, {
+                reason: interaction.components[0].components[0].value,
             });
-        }
-        if (interaction.guild != null) {
-            const channel = await interaction.guild.channels.fetch(
-                process.env.BAN_LOGS_CHANNEL
-            );
-            if (channel?.isTextBased()) {
-                channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle('User Banned via Banshare')
-                            .setDescription(`<@!${data.userId}> was banned!`)
-                            .setFields([
-                                {
-                                    name: 'Reason',
-                                    value: interaction.components[0]
-                                        .components[0].value,
-                                },
-                            ])
-                            .setAuthor({
-                                name: interaction.user.username,
-                                iconURL:
-                                    interaction.user.avatarURL({ size: 32 }) ??
-                                    undefined,
-                            }),
+            await interaction.reply({
+                content: `<@${data.userId}> (\`${data.userId}\`) was banned.`,
+                ephemeral: true,
+            });
+            if (interaction.message) {
+                await interaction.message.edit({
+                    components: [
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('fakeBanButton')
+                                .setLabel('Ban')
+                                .setStyle(ButtonStyle.Danger)
+                                .setDisabled(true)
+                        ),
                     ],
                 });
             }
+            if (interaction.guild != null) {
+                const channel = await interaction.guild.channels.fetch(
+                    process.env.BAN_LOGS_CHANNEL
+                );
+                if (channel?.isTextBased()) {
+                    channel.send({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setTitle('User Banned via Banshare')
+                                .setDescription(
+                                    `<@!${data.userId}> was banned!`
+                                )
+                                .setFields([
+                                    {
+                                        name: 'Reason',
+                                        value: interaction.components[0]
+                                            .components[0].value,
+                                    },
+                                ])
+                                .setAuthor({
+                                    name: interaction.user.username,
+                                    iconURL:
+                                        interaction.user.avatarURL({
+                                            size: 32,
+                                        }) ?? undefined,
+                                }),
+                        ],
+                    });
+                }
+            }
+        } catch {
+            await interaction.reply({
+                content: `Couldn't ban <@${data.userId}>`,
+                ephemeral: true,
+            });
         }
     }
 );
