@@ -94,10 +94,12 @@ const banButton = new Button(
             });
         }
 
-        const reason =
-            'Simulated Ban share: ' +
-            (interaction.message.embeds[0].fields[4].value ??
-                'no reason provided');
+        const reason = `${
+            interaction.message.embeds[0].fields[4].value ?? 'Simulated'
+        } Ban share: ${
+            interaction.message.embeds[0].fields[3].value ??
+            'no reason provided'
+        }`;
 
         const modal = banModal.modal(
             {
