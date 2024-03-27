@@ -24,7 +24,7 @@ export const migrateWarningsCommand: Command = {
             const issuer = await interaction.guild.members.fetch(warning.issuerId).
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            interaction.channel.send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at <t:${date}>, By ${issuer.username}`)
+            interaction.guild.channels.fetch("1133014478628343818").send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at <t:${date}>, By ${issuer.username}`)
         }
     },
 };
