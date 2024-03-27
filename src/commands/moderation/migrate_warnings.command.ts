@@ -5,28 +5,32 @@ import prisma from '../../utils/prisma';
 export const migrateWarningsCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('migrate-warnings')
-        .setDescription("Migrate warnings to zeppelin")
+        .setDescription('Migrate warnings to zeppelin')
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .setDMPermission(false),
     async execute(interaction) {
         if (!interaction.guild) return;
 
-        await interaction.deferReply()
+        await interaction.deferReply();
 
-        const warnings = await prisma.warning.findMany()
+        const warnings = await prisma.warning.findMany();
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         for (const warning of warnings) {
-            const date = Math.floor(new Date(warning.timestamp).getTime() / 1000);
-            const dateString: string = `<t:${date}>`
+            const date = Math.floor(
+                new Date(warning.timestamp).getTime() / 1000
+            );
+            const dateString: string = `<t:${date}>`;
 
             if (interaction.guild !== null && interaction.channel !== null) {
-                const issuer = await interaction.guild.members.fetch(warning.issuerId);
-                await interaction.channel.send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuer.user.username}`)
+                const issuer = await interaction.guild.members.fetch(
+                    warning.issuerId
+                );
+                await interaction.channel.send(
+                    `!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuer.user.username}`
+                );
             }
         }
 
-        await interaction.editReply("Finished going through all warnings!")
+        await interaction.editReply('Finished going through all warnings!');
     },
 };
