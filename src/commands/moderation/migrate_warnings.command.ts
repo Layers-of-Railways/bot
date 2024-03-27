@@ -19,12 +19,13 @@ export const migrateWarningsCommand: Command = {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const date = Math.floor(new Date(warning.timestamp).getTime() / 1000);
+            const dateString: string = `<t:${date}>`
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            const issuer = await interaction.guild.members.fetch(warning.issuerId).
+            const issuer = await interaction.guild.members.fetch(warning.issuerId);
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            interaction.guild.channels.fetch("1133014478628343818").send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at <t:${date}>, By ${issuer.username}`)
+            await interaction.channel.send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuer.username}`)
         }
     },
 };

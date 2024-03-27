@@ -66,9 +66,9 @@ export const tagCommandTextBased = async (event: Message<boolean>) => {
 
     if (!tag) return;
 
-    const embed = new EmbedBuilder();
-    embed.setTitle(tag.title ?? tag.name);
-    embed.setDescription(tag.content);
+    const embed = new EmbedBuilder()
+        .setTitle(tag.title ?? tag.name)
+        .setDescription(tag.content);
     if (tag.color) embed.setColor(tag.color);
     if (tag.image) embed.setImage(tag.image);
     if (tag.fields) embed.setFields(tag.fields);
