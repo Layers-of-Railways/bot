@@ -22,11 +22,18 @@ export const migrateWarningsCommand: Command = {
             const dateString: string = `<t:${date}>`;
 
             if (interaction.guild !== null && interaction.channel !== null) {
-                const issuer = await interaction.guild.members.fetch(
-                    warning.issuerId
-                );
+                let issuerString: string = 'Unknown Moderator';
+                try {
+                    const issuer = await interaction.guild.members.fetch(
+                        warning.issuerId
+                    );
+                    issuerString = issuer.user.username;
+                } catch {
+                    issuerString = warning.issuerId;
+                }
+
                 await interaction.channel.send(
-                    `!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuer.user.username}`
+                    `!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuerString}`
                 );
             }
         }
