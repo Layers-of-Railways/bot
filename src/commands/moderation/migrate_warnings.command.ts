@@ -11,21 +11,22 @@ export const migrateWarningsCommand: Command = {
     async execute(interaction) {
         if (!interaction.guild) return;
 
+        await interaction.deferReply()
+
         const warnings = await prisma.warning.findMany()
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        for (const warning: {id: string, reason: string, timestamp: Date, issuerId: string, userId: string} in warnings) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+        for (const warning of warnings) {
             const date = Math.floor(new Date(warning.timestamp).getTime() / 1000);
             const dateString: string = `<t:${date}>`
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            const issuer = await interaction.guild.members.fetch(warning.issuerId);
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            await interaction.channel.send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuer.username}`)
+
+            if (interaction.guild !== null && interaction.channel !== null) {
+                const issuer = await interaction.guild.members.fetch(warning.issuerId);
+                await interaction.channel.send(`!note ${warning.userId} ${warning.reason} | Migrated warning, Originally created at ${dateString}, By ${issuer.user.username}`)
+            }
         }
+
+        await interaction.editReply("Finished going through all warnings!")
     },
 };
