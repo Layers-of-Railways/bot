@@ -1,4 +1,10 @@
-import { ButtonBuilder, ButtonInteraction, Events, Interaction, InteractionButtonComponentData } from 'discord.js';
+import {
+    ButtonBuilder,
+    ButtonInteraction,
+    Events,
+    Interaction,
+    InteractionButtonComponentData,
+} from 'discord.js';
 import { Handler } from '..';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

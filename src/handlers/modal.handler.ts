@@ -1,4 +1,9 @@
-import { Events, ModalBuilder, ModalComponentData, ModalSubmitInteraction } from 'discord.js';
+import {
+    Events,
+    ModalBuilder,
+    ModalComponentData,
+    ModalSubmitInteraction,
+} from 'discord.js';
 import { Handler } from '..';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

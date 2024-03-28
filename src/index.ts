@@ -97,9 +97,13 @@ client.on(Events.ThreadCreate, async (channel) => {
                 (r) => r.name === 'Moderator'
             )!;
 
-            const message = await channel.send("Bringing mods into this thread so they can see it!")
-            await message.edit(`${pingRole}`)
-            await message.edit(`Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`)
+            const message = await channel.send(
+                'Bringing mods into this thread so they can see it!'
+            );
+            await message.edit(`${pingRole}`);
+            await message.edit(
+                `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
+            );
         }
     } catch (error) {
         console.error('Error handling ThreadCreate', error);
