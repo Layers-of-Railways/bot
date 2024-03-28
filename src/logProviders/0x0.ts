@@ -8,17 +8,8 @@ export const r0x0: LogProvider = {
         const r = text.match(reg);
         if (r == null || !r[0]) return;
         const link = r[0];
-        let log: string;
-        try {
-            const f = await fetch(link);
-            if (f.status != 200) {
-                throw 'nope';
-            }
-            log = await f.text();
-        } catch (err) {
-            console.log('Log analyze fail', err);
-            return;
-        }
-        return log;
+        const f = await fetch(link);
+        if (f.status != 200) return;
+        return await f.text();
     },
 };

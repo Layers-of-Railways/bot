@@ -55,7 +55,7 @@ export const tagCommand: Command = {
     },
 };
 
-export const tagCommandTextBased = async (event: Message<boolean>) => {
+export const tagCommandTextBased = async (event: Message) => {
     const tagName = event.content.split('!!')[1];
 
     const tags = await getTags();

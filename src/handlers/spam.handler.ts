@@ -45,7 +45,7 @@ const banModal = new Modal(
                 process.env.BAN_LOGS_CHANNEL
             );
             if (channel?.isTextBased()) {
-                channel.send({
+                await channel.send({
                     embeds: [
                         new EmbedBuilder()
                             .setTitle('User Banned for spam')

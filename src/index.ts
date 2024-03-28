@@ -14,6 +14,7 @@ import './webserver';
 import { buttonHandler } from './handlers/button.handler';
 import textCommandHandler from './handlers/textCommand.handler';
 import { modalHandler } from './handlers/modal.handler';
+import { ChannelType } from 'discord-api-types/v10';
 // import { spamHandler } from './handlers/spam.handler';
 
 export const client = new Client({
@@ -84,7 +85,28 @@ client.once(Events.ClientReady, async () => {
     });
 });
 
-export type Handler = (client: Client<false>) => void;
+client.on(Events.ThreadCreate, async (channel) => {
+    try {
+        if (
+            channel.type === ChannelType.PublicThread &&
+            channel.parent &&
+            channel.parent.name === 'support' &&
+            channel.guild
+        ) {
+            const pingRole = channel.guild.roles.cache.find(
+                (r) => r.name === 'Moderator'
+            )!;
+
+            const message = await channel.send("Bringing mods into this thread so they can see it!")
+            await message.edit(`${pingRole}`)
+            await message.edit(`Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`)
+        }
+    } catch (error) {
+        console.error('Error handling ThreadCreate', error);
+    }
+});
+
+export type Handler = (client: Client) => void;
 
 const handlers: Handler[] = [
     commandHandler,
@@ -101,7 +123,9 @@ for (const handler of handlers) {
 
 reloadGlobalSlashCommands()
     .then(() => {
-        client.login(process.env.DISCORD_TOKEN);
+        client
+            .login(process.env.DISCORD_TOKEN)
+            .then(() => console.log('Logged into discord'));
     })
     .catch((e) => {
         console.error(e);

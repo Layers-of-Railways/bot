@@ -10,17 +10,8 @@ export const hastebin: LogProvider = {
         const link = r[0];
         const id = link.replace('https://hst.sh/', '');
         if (!id) return;
-        let log: string;
-        try {
-            const f = await fetch(`https://hst.sh/raw/${id}`);
-            if (f.status != 200) {
-                throw 'nope';
-            }
-            log = await f.text();
-        } catch (err) {
-            console.log('Log analyze fail', err);
-            return;
-        }
-        return log;
+        const f = await fetch(`https://hst.sh/raw/${id}`);
+        if (f.status != 200) return;
+        return await f.text();
     },
 };

@@ -7,9 +7,6 @@ import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
 import { Handler } from '..';
 import { Log } from '../logs/Log';
 
-export type LogAnalyzer = (
-    url: string
-) => Promise<null | { name: string; value: string }>;
 export interface LogProvider {
     hostnames: string[];
     parse: (url: string) => Promise<void | string>;
@@ -29,7 +26,7 @@ for (const provider of logProviders) {
 
 async function parseWebLog(text: string): Promise<string | void> {
     const reg = text.match(
-        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/
     );
     if (!reg) return;
     const url = reg[0];
@@ -73,7 +70,7 @@ export const logHandler: Handler = (client) => {
 
             const regexPasses = [
                 /---- Minecraft Crash Report ----/, // Forge Crash report
-                /\n\\|[\\s\\d]+\\| Minecraft\\s+\\| minecraft\\s+\\| (\\S+).+\n/, // Quilt mod table
+                /\n\\|[\\sd]+\\| Minecraft\\s+\\| minecraft\\s+\\| (\\S+).+\n/, // Quilt mod table
                 /: Loading Minecraft (\\S+)/, // Fabric, Quilt
                 /--fml.mcVersion, ([^\\s,]+)/, // Forge
                 /--version, ([^,]+),/, // ATLauncher
@@ -172,7 +169,7 @@ export const logHandler: Handler = (client) => {
             const issues = await findIssues(parsedLog);
 
             if (!issues.length) {
-                message.reply({ embeds: [logInfoEmbed] });
+                await message.reply({ embeds: [logInfoEmbed] });
                 return;
             }
 
@@ -186,7 +183,7 @@ export const logHandler: Handler = (client) => {
                 .setFields(...issues)
                 .setColor('Red');
 
-            message.reply({ embeds: [logInfoEmbed, issuesEmbed] });
+            await message.reply({ embeds: [logInfoEmbed, issuesEmbed] });
             return;
         } catch (error) {
             console.error('Unhandled exception on MessageCreate', error);

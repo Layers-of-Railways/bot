@@ -1,10 +1,4 @@
-import {
-    ButtonBuilder,
-    ButtonInteraction,
-    Events,
-    Interaction,
-    InteractionButtonComponentData,
-} from 'discord.js';
+import { ButtonBuilder, ButtonInteraction, Events, Interaction, InteractionButtonComponentData } from 'discord.js';
 import { Handler } from '..';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,11 +21,10 @@ export class Button<ArgsType> {
         data: Omit<InteractionButtonComponentData, 'customId' | 'type'>,
         args: ArgsType
     ): ButtonBuilder {
-        const button = new ButtonBuilder({
+        return new ButtonBuilder({
             ...data,
             customId: JSON.stringify({ id: this.id, args }),
         });
-        return button;
     }
 }
 
