@@ -28,8 +28,8 @@ jobs:
             - name: Adjust platform string
               id: adjust_platform
               run: |
-                  ADJUSTED_PLATFORM=$(echo "${{ matrix.platform }}" | sed 's/linux\///')
-                  echo "ADJUSTED_PLATFORM=$ADJUSTED_PLATFORM" >> $GITHUB_ENV
+                ADJUSTED_PLATFORM=$(echo "${{ matrix.platform }}" | sed 's/linux\///')
+                echo "ADJUSTED_PLATFORM=$ADJUSTED_PLATFORM" >> $GITHUB_ENV
 
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
