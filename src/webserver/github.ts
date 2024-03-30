@@ -6,6 +6,8 @@ import {
     ButtonStyle,
     Client,
     EmbedBuilder,
+    FetchMessageOptions,
+    MessageResolvable,
 } from 'discord.js';
 import { Commit } from '../types/github';
 
@@ -181,10 +183,10 @@ const actionCompleted = async (client: Client, req: Request) => {
             forgeButton
         );
 
-        oldMessage.edit({ embeds: [embed], components: [actionRow] });
+        await oldMessage.edit({ embeds: [embed], components: [actionRow] });
         githubMap.delete(workflow_run.id);
     } else {
-        oldMessage.edit({ embeds: [embed] });
+        await oldMessage.edit({ embeds: [embed] });
         githubMap.delete(workflow_run.id);
     }
 };
@@ -201,17 +203,17 @@ const generateMavenUrl = (
 };
 
 const generateCommitsString = (head_sha: string) => {
-    if (!commitMap.get(head_sha)) {
-        return 'No commits found';
-    }
+    if (!commitMap.get(head_sha)) return 'No commits found';
+
     const commitsArray = commitMap.get(head_sha);
     if (!commitsArray) return;
     const commitString = commitsArray.commits
         .map((commit) => {
             const committer = commit.committer;
             const userProfile = `https://github.com/${committer.username}`;
-            const messageWithoutHashtag = commit.message.replace(/#/g, ''); // Remove all '#' symbols
-            return `[➤](${commit.url}) ${messageWithoutHashtag} - [${committer.username}](${userProfile})`;
+            const commitTitle = commit.message.split("\n")[0]
+            const messageWithEscapedHashtag = commitTitle.replace(/#/g, '\#'); // Remove all '#' symbols
+            return `[➤](${commit.url}) ${messageWithEscapedHashtag} - [${committer.username}](${userProfile})`;
         })
         .join('\n');
 
@@ -232,11 +234,7 @@ const getTimeTaken = (time: number) => {
     const secondsString =
         seconds > 0 ? `${seconds} second${seconds !== 1 ? 's' : ''}` : '';
 
-    const timeTaken = `${minutesString}${
-        minutesString && secondsString ? ' and ' : ''
-    }${secondsString}`;
-
-    return timeTaken;
+    return `${minutesString}${minutesString && secondsString ? ' and ' : ''}${secondsString}`;
 };
 
 const getVersion = async (apiurl: URL, run_number: string) => {
@@ -299,9 +297,5 @@ const verify_signature = (req: Request) => {
 };
 
 const isBuildRun = (req: Request) => {
-    if (req.body.workflow_run.path == '.github/workflows/build.yml') {
-        return true;
-    } else {
-        return false;
-    }
+    return req.body.workflow_run.path == '.github/workflows/build.yml';
 };
