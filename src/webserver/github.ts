@@ -6,8 +6,6 @@ import {
     ButtonStyle,
     Client,
     EmbedBuilder,
-    FetchMessageOptions,
-    MessageResolvable,
 } from 'discord.js';
 import { Commit } from '../types/github';
 
