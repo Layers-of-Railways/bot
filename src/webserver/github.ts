@@ -211,8 +211,8 @@ const generateCommitsString = (head_sha: string) => {
         .map((commit) => {
             const committer = commit.committer;
             const userProfile = `https://github.com/${committer.username}`;
-            const commitTitle = commit.message.split("\n")[0]
-            const messageWithEscapedHashtag = commitTitle.replace(/#/g, '\#'); // Remove all '#' symbols
+            const commitTitle = commit.message.split('\n')[0];
+            const messageWithEscapedHashtag = commitTitle.replace(/#/g, '\\#'); // Remove all '#' symbols
             return `[➤](${commit.url}) ${messageWithEscapedHashtag} - [${committer.username}](${userProfile})`;
         })
         .join('\n');
