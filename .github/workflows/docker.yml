@@ -25,6 +25,12 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
+            - name: Adjust platform string
+              id: adjust_platform
+              run: |
+                ADJUSTED_PLATFORM=$(echo "${{ matrix.platform }}" | sed 's/linux\///')
+                echo "ADJUSTED_PLATFORM=$ADJUSTED_PLATFORM" >> $GITHUB_ENV
+
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
               if: ${{ matrix.platform != 'linux/amd64' }}
@@ -69,7 +75,7 @@ jobs:
             - name: Upload digests
               uses: actions/upload-artifact@v4
               with:
-                  name: digests-${{ matrix.platform }}
+                  name: digests-${{ env.ADJUSTED_PLATFORM }}
                   path: /tmp/digests/*
                   if-no-files-found: error
                   retention-days: 1
