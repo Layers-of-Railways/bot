@@ -87,12 +87,7 @@ client.once(Events.ClientReady, async () => {
 
 client.on(Events.ThreadCreate, async (channel) => {
     try {
-        if (
-            channel.type === ChannelType.PublicThread &&
-            channel.parent &&
-            channel.parent.name === 'support' &&
-            channel.guild
-        ) {
+        if (channel.type === ChannelType.PublicThread && channel.guild) {
             const pingRole = channel.guild.roles.cache.find(
                 (r) => r.name === 'Moderator'
             )!;
@@ -101,9 +96,14 @@ client.on(Events.ThreadCreate, async (channel) => {
                 'Bringing mods into this thread so they can see it!'
             );
             await message.edit(`${pingRole}`);
-            await message.edit(
-                `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
-            );
+
+            if (channel.parent && channel.parent.name === 'support') {
+                await message.edit(
+                    `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
+                );
+            } else {
+                await message.delete()
+            }
         }
     } catch (error) {
         console.error('Error handling ThreadCreate', error);
