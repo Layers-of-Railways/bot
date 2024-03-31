@@ -102,7 +102,7 @@ client.on(Events.ThreadCreate, async (channel) => {
                     `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
                 );
             } else {
-                await message.delete()
+                await message.delete();
             }
         }
     } catch (error) {
