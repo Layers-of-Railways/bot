@@ -97,7 +97,9 @@ client.on(Events.ThreadCreate, async (channel) => {
             );
             await message.edit(`${pingRole}`);
 
-            setTimeout({
+            await sleep(3000)
+            
+
             if (channel.parent && channel.parent.name === 'support') {
                 await message.edit(
                     `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
@@ -105,8 +107,7 @@ client.on(Events.ThreadCreate, async (channel) => {
             } else {
                 await message.delete();
             }
-       }, 5000)
-        }
+    }
     } catch (error) {
         console.error('Error handling ThreadCreate', error);
     }
