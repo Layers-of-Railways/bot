@@ -97,8 +97,7 @@ client.on(Events.ThreadCreate, async (channel) => {
             );
             await message.edit(`${pingRole}`);
 
-            await sleep(3000)
-            
+            await sleep(3000);
 
             if (channel.parent && channel.parent.name === 'support') {
                 await message.edit(
@@ -107,7 +106,7 @@ client.on(Events.ThreadCreate, async (channel) => {
             } else {
                 await message.delete();
             }
-    }
+        }
     } catch (error) {
         console.error('Error handling ThreadCreate', error);
     }
