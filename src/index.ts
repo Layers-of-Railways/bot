@@ -98,11 +98,9 @@ client.on(Events.ThreadCreate, async (channel) => {
             await message.edit(`${pingRole}`);
 
             if (channel.parent && channel.parent.name === 'support') {
-                await message.edit(
-                    `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
-                );
+                await message.edit(`Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`);
             } else {
-                await message.delete();
+                await message.delete({ timeout: 3000 });
             }
         }
     } catch (error) {
