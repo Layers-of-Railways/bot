@@ -97,8 +97,6 @@ client.on(Events.ThreadCreate, async (channel) => {
             );
             await message.edit(`${pingRole}`);
 
-            await sleep(3000);
-
             if (channel.parent && channel.parent.name === 'support') {
                 await message.edit(
                     `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
