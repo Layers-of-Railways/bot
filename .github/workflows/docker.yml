@@ -48,6 +48,11 @@ jobs:
                       type=ref,event=branch
                       type=raw,value=latest
 
+            - name: Set up Python 3.10
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.10.7"
+
             - name: Build and push by digest
               uses: docker/build-push-action@v5
               id: build
