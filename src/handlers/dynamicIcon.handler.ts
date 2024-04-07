@@ -19,10 +19,8 @@ export const dynamicIconHandler: Handler = (client) => {
     let timeout: NodeJS.Timeout | undefined = undefined;
     if (Date.now() > endTime) return;
     client.on('messageCreate', async (message) => {
-        if (
-            message.content != 'start numismatics icon thingy please' &&
-            message.member?.permissions.has('Administrator')
-        ) {
+        if (message.content != 'start numismatics icon thingy please') return;
+        if (!message.member?.permissions.has('Administrator')) {
             message.reply('nuh uh');
             return;
         }
@@ -30,6 +28,7 @@ export const dynamicIconHandler: Handler = (client) => {
             message.reply('it already started silly');
             return;
         }
+        message.reply('ok!!');
         const updateIcon = async () => {
             const currentTime = Date.now() - startTime;
             const currentProgress = currentTime / totalTime;
