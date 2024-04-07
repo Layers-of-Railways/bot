@@ -1,0 +1,28 @@
+name: Lint Fix
+
+on:
+    workflow_dispatch:
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Lint
+              run: pnpm run lint:fix
+
+            - name: Push Changes
+              uses: stefanzweifel/git-auto-commit-action@8756aa072ef5b4a080af5dc8fef36c5d586e521d

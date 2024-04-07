@@ -98,6 +98,8 @@ const commandHandler: Handler = (client) => {
         } catch (error) {
             // in case of an error
 
+            console.log(error);
+
             if (interaction.isRepliable())
                 await interaction.reply({
                     embeds: [

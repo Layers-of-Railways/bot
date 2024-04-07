@@ -29,11 +29,10 @@ export class Modal<ArgsType> {
         data: Omit<ModalComponentData, 'customId' | 'type'>,
         args: ArgsType
     ): ModalBuilder {
-        const modal = new ModalBuilder({
+        return new ModalBuilder({
             ...data,
             customId: JSON.stringify({ id: this.id, args }),
         });
-        return modal;
     }
 }
 

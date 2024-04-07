@@ -7,7 +7,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get('/', function (req, res) {
+app.get('/', function (_, res) {
     res.status(200).send('Request received successfully');
 });
 

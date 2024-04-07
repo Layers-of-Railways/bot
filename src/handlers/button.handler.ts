@@ -27,11 +27,10 @@ export class Button<ArgsType> {
         data: Omit<InteractionButtonComponentData, 'customId' | 'type'>,
         args: ArgsType
     ): ButtonBuilder {
-        const button = new ButtonBuilder({
+        return new ButtonBuilder({
             ...data,
             customId: JSON.stringify({ id: this.id, args }),
         });
-        return button;
     }
 }
 
