@@ -57,7 +57,9 @@ jobs:
               run: python -c "print('Hello World')"
 
             - name: Canvas build deps
-              run: sudo apt-get install build-essential libcairo2-dev libpango1.0-dev
+              run: |
+                  sudo apt-get install build-essential libcairo2-dev libpango1.0-dev
+                  export PYTHON=$(which python)
 
             - name: Build and push by digest
               uses: docker/build-push-action@v5
