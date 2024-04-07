@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN apt-get install build-essential libcairo2-dev libpango1.0-dev -y
+RUN apk add npm python3 build-base pango-dev cairo-dev
 
 RUN which python
 
