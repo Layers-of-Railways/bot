@@ -21,18 +21,20 @@ export const dynamicIconHandler: Handler = (client) => {
     client.on('messageCreate', async (message) => {
         if (message.content != 'start numismatics icon thingy please') return;
         if (!message.member?.permissions.has('Administrator')) {
-            message.reply('nuh uh');
+            await message.reply('nuh uh');
             return;
         }
         if (timeout) {
-            message.reply('it already started silly');
+            await message.reply('it already started silly');
             return;
         }
-        message.reply('ok!!');
+        await message.reply('ok!!');
         const updateIcon = async () => {
             const currentTime = Date.now() - startTime;
             const currentProgress = currentTime / totalTime;
-            console.log(currentProgress);
+            console.log(
+                `Current Progress at ${Date.now()} is ${currentProgress}`
+            );
             message.guild?.setIcon(
                 await stream2buffer(await generateIcon(currentProgress / 2))
             );
@@ -40,8 +42,8 @@ export const dynamicIconHandler: Handler = (client) => {
                 clearInterval(timeout);
             }
         };
-        updateIcon();
-        timeout = setInterval(updateIcon, 1800_000);
+        await updateIcon();
+        timeout = setInterval(updateIcon, 3600_000);
     });
 };
 
