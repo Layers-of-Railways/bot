@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN sudo apt-get install build-essential libcairo2-dev libpango1.0-dev
+RUN apt-get install build-essential libcairo2-dev libpango1.0-dev -y
 
 RUN which python
 
