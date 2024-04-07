@@ -36,6 +36,9 @@ export const dynamicIconHandler: Handler = (client) => {
             message.guild?.setIcon(
                 await stream2buffer(await generateIcon(currentProgress / 2))
             );
+            if (currentProgress == 2) {
+                clearInterval(timeout);
+            }
         };
         updateIcon();
         timeout = setInterval(updateIcon, 1800_000);
