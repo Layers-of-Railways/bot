@@ -6,6 +6,14 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
+RUN sudo apt-get install build-essential libcairo2-dev libpango1.0-dev
+
+RUN which python
+
+RUN export PYTHON=$(which python)
+
+RUN pnpm config set python "$(which python)"
+
 RUN pnpm install --frozen-lockfile
 
 COPY . .
