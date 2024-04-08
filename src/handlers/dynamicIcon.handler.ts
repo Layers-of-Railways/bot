@@ -33,7 +33,7 @@ export const dynamicIconHandler: Handler = (client) => {
             const currentTime = Date.now() - startTime;
             const currentProgress = currentTime / totalTime;
             console.log(
-                `Current Progress at ${new Date().toLocaleString()} is ${Math.round((currentProgress) * 100)}%`
+                `Current Progress at ${new Date().toLocaleString()} is ${Math.round(currentProgress * 100)}%`
             );
             message.guild?.setIcon(
                 await stream2buffer(await generateIcon(currentProgress / 2))
