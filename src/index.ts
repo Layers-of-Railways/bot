@@ -92,17 +92,17 @@ client.on(Events.ThreadCreate, async (channel) => {
                 (r) => r.name === 'Moderator'
             );
 
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await timeout(2000);
 
             const message = await channel.send(
                 'Bringing mods into this thread so they can see it!'
             );
 
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await timeout(2000);
 
             await message.edit(`${pingRole}`);
 
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await timeout(2000);
 
             if (channel.parent && channel.parent.name === 'support') {
                 await message.edit(
@@ -116,6 +116,10 @@ client.on(Events.ThreadCreate, async (channel) => {
         console.error('Error handling ThreadCreate', error);
     }
 });
+
+async function timeout(time: number | undefined) {
+    return await new Promise((resolve) => setTimeout(resolve, time));
+}
 
 export type Handler = (client: Client) => void;
 
