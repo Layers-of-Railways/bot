@@ -6,14 +6,6 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN apk add npm python3 build-base pango-dev cairo-dev
-
-RUN which python
-
-RUN export PYTHON=$(which python)
-
-RUN pnpm config set python "$(which python)"
-
 RUN pnpm install --frozen-lockfile
 
 COPY . .
