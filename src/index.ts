@@ -92,7 +92,7 @@ client.on(Events.ThreadCreate, async (channel) => {
                 (r) => r.name === 'Moderator'
             );
 
-            await new Promise(resolve => setTimeout(resolve, 5000))
+            await new Promise((resolve) => setTimeout(resolve, 5000));
 
             const message = await channel.send(
                 'Bringing mods into this thread so they can see it!'
