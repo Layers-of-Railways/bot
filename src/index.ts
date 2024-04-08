@@ -15,7 +15,6 @@ import { buttonHandler } from './handlers/button.handler';
 import textCommandHandler from './handlers/textCommand.handler';
 import { modalHandler } from './handlers/modal.handler';
 import { ChannelType } from 'discord-api-types/v10';
-import { dynamicIconHandler } from './handlers/dynamicIcon.handler';
 // import { spamHandler } from './handlers/spam.handler';
 
 export const client = new Client({
@@ -121,7 +120,6 @@ const handlers: Handler[] = [
     logHandler,
     buttonHandler,
     modalHandler,
-    dynamicIconHandler,
     // spamHandler,
 ];
 
