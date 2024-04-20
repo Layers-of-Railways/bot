@@ -130,7 +130,7 @@ const actionCompleted = async (client: Client, req: Request) => {
 
     let versionOrVersionAndLogs = `Version: **${version}**`;
 
-    if (!workflow_run.conclusion) {
+    if (workflow_run.conclusion === 'failure') {
         const runId = workflow_run.id;
         const jobId: string = await fetch(
             `https://api.github.com/repos/Layers-of-Railways/Railway/actions/runs/${runId}/jobs`
