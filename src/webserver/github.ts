@@ -128,24 +128,25 @@ const actionCompleted = async (client: Client, req: Request) => {
         githubMap.get(workflow_run.id)!
     );
 
-    let versionOrVersionAndLogs = `Version: **${version}**`
+    let versionOrVersionAndLogs = `Version: **${version}**`;
 
     if (!workflow_run.conclusion) {
-        const runId = workflow_run.id
-        const jobId: string = await fetch(`https://api.github.com/repos/Layers-of-Railways/Railway/actions/runs/${runId}/jobs`)
-            .then(response => response.json())
-            .then(data => {
+        const runId = workflow_run.id;
+        const jobId: string = await fetch(
+            `https://api.github.com/repos/Layers-of-Railways/Railway/actions/runs/${runId}/jobs`
+        )
+            .then((response) => response.json())
+            .then((data) => {
                 if (data.jobs && data.jobs.length > 0) {
                     return data.jobs[0].id;
                 } else {
-                    return "error"
+                    return 'error';
                 }
-            })
-        const logsUrl = `https://github.com/Layers-of-Railways/Railway/actions/runs/${workflow_run.id}/job/${jobId}`
+            });
+        const logsUrl = `https://github.com/Layers-of-Railways/Railway/actions/runs/${workflow_run.id}/job/${jobId}`;
 
-        versionOrVersionAndLogs += `[Run logs](${logsUrl})`
+        versionOrVersionAndLogs += `[Run logs](${logsUrl})`;
     }
-
 
     const embed = new EmbedBuilder()
         .setAuthor({
