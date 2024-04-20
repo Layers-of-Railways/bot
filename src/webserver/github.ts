@@ -145,7 +145,7 @@ const actionCompleted = async (client: Client, req: Request) => {
             });
         const logsUrl = `https://github.com/Layers-of-Railways/Railway/actions/runs/${workflow_run.id}/job/${jobId}`;
 
-        versionOrVersionAndLogs += `[Run logs](${logsUrl})`;
+        versionOrVersionAndLogs += `\n[Run logs](${logsUrl})`;
     }
 
     const embed = new EmbedBuilder()
