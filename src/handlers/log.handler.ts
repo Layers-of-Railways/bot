@@ -1,13 +1,10 @@
 import {
-    ActionRow,
     ActionRowBuilder,
-    ActionRowData,
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
     Events,
     inlineCode,
-    MessageActionRowComponentData,
     MessagePayload,
     MessageReplyOptions,
 } from 'discord.js';
@@ -18,7 +15,6 @@ import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
 
 import { Handler } from '..';
 import { Log } from '../logs/Log';
-import { MessageActionRowComponentBuilder } from '@discordjs/builders';
 
 export interface LogProvider {
     hostnames: string[];
