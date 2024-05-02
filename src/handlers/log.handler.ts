@@ -1,12 +1,15 @@
 import {
-    ActionRow, ActionRowBuilder,
+    ActionRow,
+    ActionRowBuilder,
     ActionRowData,
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
     Events,
     inlineCode,
-    MessageActionRowComponentData, MessagePayload, MessageReplyOptions,
+    MessageActionRowComponentData,
+    MessagePayload,
+    MessageReplyOptions,
 } from 'discord.js';
 
 // log providers
@@ -171,27 +174,27 @@ export const logHandler: Handler = (client) => {
                 });
 
             let responseData = {
-                "success": false,
-                "id": "error",
-                "url": "https://mclo.gs/error",
-                "raw": "https://api.mclo.gs/1/raw/error"
+                success: false,
+                id: 'error',
+                url: 'https://mclo.gs/error',
+                raw: 'https://api.mclo.gs/1/raw/error',
             };
 
-            let actionRowData
+            let actionRowData;
 
             if (attachment) {
                 const formData: FormData = new FormData();
-                formData.append("content", log)
+                formData.append('content', log);
                 const data: RequestInit = {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: formData
-                }
-                await fetch("https://api.mclo.gs/1/log", data)
-                    .then(res => res.json())
-                    .then(data => responseData = data);
+                    body: formData,
+                };
+                await fetch('https://api.mclo.gs/1/log', data)
+                    .then((res) => res.json())
+                    .then((data) => (responseData = data));
 
                 if (responseData.success) {
                     const logLink = new ButtonBuilder()
@@ -201,8 +204,11 @@ export const logHandler: Handler = (client) => {
                         .setURL(responseData.raw)
                         .setStyle(ButtonStyle.Link);
 
-                    actionRowData = new ActionRowBuilder<ButtonBuilder>()
-                        .addComponents(logLink, rawLogLink)
+                    actionRowData =
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            logLink,
+                            rawLogLink
+                        );
                 }
             }
 
@@ -215,11 +221,11 @@ export const logHandler: Handler = (client) => {
             const issues = await findIssues(parsedLog);
 
             const messageData: MessagePayload | MessageReplyOptions = {
-                embeds: [logInfoEmbed]
-            }
+                embeds: [logInfoEmbed],
+            };
 
             if (responseData.success) {
-                messageData.components?.push(actionRowData!)
+                messageData.components?.push(actionRowData!);
             }
 
             if (!issues.length) {
@@ -237,7 +243,7 @@ export const logHandler: Handler = (client) => {
                 .setFields(...issues)
                 .setColor('Red');
 
-            messageData.embeds?.push(issuesEmbed)
+            messageData.embeds?.push(issuesEmbed);
             await message.reply(messageData);
             return;
         } catch (error) {
