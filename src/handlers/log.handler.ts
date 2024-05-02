@@ -1,4 +1,13 @@
-import { EmbedBuilder, Events, inlineCode } from 'discord.js';
+import {
+    ActionRow, ActionRowBuilder,
+    ActionRowData,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    Events,
+    inlineCode,
+    MessageActionRowComponentData, MessagePayload, MessageReplyOptions,
+} from 'discord.js';
 
 // log providers
 import logProviders from '../logProviders/_logProviders';
@@ -6,6 +15,7 @@ import logAnalyzers from '../logIssueAnalyzers/_logIssueAnalyzers';
 
 import { Handler } from '..';
 import { Log } from '../logs/Log';
+import { MessageActionRowComponentBuilder } from '@discordjs/builders';
 
 export interface LogProvider {
     hostnames: string[];
@@ -160,6 +170,42 @@ export const logHandler: Handler = (client) => {
                     inline: true,
                 });
 
+            let responseData = {
+                "success": false,
+                "id": "error",
+                "url": "https://mclo.gs/error",
+                "raw": "https://api.mclo.gs/1/raw/error"
+            };
+
+            let actionRowData
+
+            if (attachment) {
+                const formData: FormData = new FormData();
+                formData.append("content", log)
+                const data: RequestInit = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                }
+                await fetch("https://api.mclo.gs/1/log", data)
+                    .then(res => res.json())
+                    .then(data => responseData = data);
+
+                if (responseData.success) {
+                    const logLink = new ButtonBuilder()
+                        .setURL(responseData.url)
+                        .setStyle(ButtonStyle.Link);
+                    const rawLogLink = new ButtonBuilder()
+                        .setURL(responseData.raw)
+                        .setStyle(ButtonStyle.Link);
+
+                    actionRowData = new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(logLink, rawLogLink)
+                }
+            }
+
             const logInfoEmbed = new EmbedBuilder()
                 .setTitle('Log File')
                 .setDescription('__Environment info__')
@@ -168,8 +214,16 @@ export const logHandler: Handler = (client) => {
 
             const issues = await findIssues(parsedLog);
 
+            const messageData: MessagePayload | MessageReplyOptions = {
+                embeds: [logInfoEmbed]
+            }
+
+            if (responseData.success) {
+                messageData.components?.push(actionRowData!)
+            }
+
             if (!issues.length) {
-                await message.reply({ embeds: [logInfoEmbed] });
+                await message.reply(messageData);
                 return;
             }
 
@@ -183,7 +237,8 @@ export const logHandler: Handler = (client) => {
                 .setFields(...issues)
                 .setColor('Red');
 
-            await message.reply({ embeds: [logInfoEmbed, issuesEmbed] });
+            messageData.embeds?.push(issuesEmbed)
+            await message.reply(messageData);
             return;
         } catch (error) {
             console.error('Unhandled exception on MessageCreate', error);
