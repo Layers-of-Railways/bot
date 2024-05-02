@@ -183,8 +183,9 @@ export const logHandler: Handler = (client) => {
             let actionRowData;
 
             if (attachment) {
-                const formData: FormData = new FormData();
+                const formData = new URLSearchParams();
                 formData.append('content', log);
+
                 const data: RequestInit = {
                     method: 'POST',
                     headers: {
@@ -199,10 +200,12 @@ export const logHandler: Handler = (client) => {
                 if (responseData.success) {
                     const logLink = new ButtonBuilder()
                         .setURL(responseData.url)
-                        .setStyle(ButtonStyle.Link);
+                        .setStyle(ButtonStyle.Link)
+                        .setLabel('View Log');
                     const rawLogLink = new ButtonBuilder()
                         .setURL(responseData.raw)
-                        .setStyle(ButtonStyle.Link);
+                        .setStyle(ButtonStyle.Link)
+                        .setLabel('View Raw Log');
 
                     actionRowData =
                         new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -222,6 +225,7 @@ export const logHandler: Handler = (client) => {
 
             const messageData: MessagePayload | MessageReplyOptions = {
                 embeds: [logInfoEmbed],
+                components: [],
             };
 
             if (responseData.success) {
