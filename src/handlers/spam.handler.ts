@@ -40,33 +40,6 @@ const banModal = new Modal(
                 ],
             });
         }
-        if (interaction.guild != null) {
-            const channel = await interaction.guild.channels.fetch(
-                process.env.BAN_LOGS_CHANNEL
-            );
-            if (channel?.isTextBased()) {
-                await channel.send({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle('User Banned for spam')
-                            .setDescription(`<@!${data.userId}> was banned!`)
-                            .setFields([
-                                {
-                                    name: 'Reason',
-                                    value: interaction.components[0]
-                                        .components[0].value,
-                                },
-                            ])
-                            .setAuthor({
-                                iconURL:
-                                    interaction.user.avatarURL({ size: 32 }) ??
-                                    undefined,
-                                name: interaction.user.username,
-                            }),
-                    ],
-                });
-            }
-        }
     }
 );
 
