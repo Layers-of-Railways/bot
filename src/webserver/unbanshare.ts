@@ -138,7 +138,7 @@ const handleUnban = async (client: Client, req: Request) => {
             { name: 'Reason', value: reason },
             { name: 'Unbanned From', value: server }
         )
-        .setColor(Colors.Red)
+        .setColor(Colors.Blurple)
         .setTimestamp();
     channel?.isTextBased() &&
         (await channel.send({
@@ -148,7 +148,7 @@ const handleUnban = async (client: Client, req: Request) => {
                     unbanButton.button(
                         {
                             label: 'Unban',
-                            style: ButtonStyle.Danger,
+                            style: ButtonStyle.Primary,
                             disabled: guildMember ? true : false,
                         },
                         { userId }
