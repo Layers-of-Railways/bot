@@ -106,7 +106,7 @@ client.on(Events.ThreadCreate, async (channel) => {
 
             if (channel.parent && channel.parent.name === 'support') {
                 await message.edit(
-                    `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help.`
+                    `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help. While waiting please check out <#1077195187698274324> to see if it already answers your question.`
                 );
             } else {
                 await message.delete();
