@@ -148,8 +148,11 @@ export const logHandler: Handler = (client) => {
                 inline: true,
             });
 
-            const createVersionMatch = log.match(/Found mod file create-\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\.jar of type MOD/);
-            const createVersion = createVersionMatch?.[1] ?? parsedLog.mods?.get('create');
+            const createVersionMatch = log.match(
+                /Found mod file create-\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\.jar of type MOD/
+            );
+            const createVersion =
+                createVersionMatch?.[1] ?? parsedLog.mods?.get('create');
 
             if (createVersion) {
                 logInfo.push(
