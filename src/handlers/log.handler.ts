@@ -148,18 +148,22 @@ export const logHandler: Handler = (client) => {
                 inline: true,
             });
 
-            if (parsedLog.mods?.has('create')) {
-                logInfo.push({
-                    name: 'Create version',
-                    value: parsedLog.mods.get('create')!,
-                    inline: true,
-                });
-                if (parsedLog.mods?.has('create'))
-                    logInfo.push({
+            const createVersionMatch = log.match(/Found mod file create-\d+\.\d+\.\d+-(\d+\.\d+\.\d+)\.jar of type MOD/);
+            const createVersion = createVersionMatch?.[1] ?? parsedLog.mods?.get('create');
+
+            if (createVersion) {
+                logInfo.push(
+                    {
+                        name: 'Create version',
+                        value: createVersion,
+                        inline: true,
+                    },
+                    {
                         name: '\u200b',
                         value: '\u200b',
                         inline: true,
-                    });
+                    }
+                );
             }
 
             if (parsedLog.mods?.has('railways'))
