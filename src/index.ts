@@ -115,7 +115,7 @@ client.on(Events.ThreadCreate, async (channel) => {
                 await timeout(2000);
                 await message.delete();
             }
-            else if (channel.parent && channel.parent.id === '1373797803914166403') {
+            else if (channel.parent && channel.parent.name === 'christmas-event-ideas') {
                 await message.edit(`${BuildRole} ${ServRole}`);
                 await timeout(2000);
                 await message.delete();
