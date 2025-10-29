@@ -110,17 +110,20 @@ client.on(Events.ThreadCreate, async (channel) => {
 
             await timeout(2000);
 
-            if (channel.parent && channel.parent.name === 'server-suggestions' || 'server-classifieds') {
+            if (channel.parent && channel.parent.name === 'server-suggestions') {
                 await message.edit(`${ServRole}`);
                 await timeout(2000);
                 await message.delete();
-            }
-            else if (channel.parent && channel.parent.name === 'christmas-event-ideas') {
+            } else if (channel.parent && channel.parent.name === 'server-classifieds') {
+                await message.edit(`${ServRole}`);
+                await timeout(2000);
+                await message.delete();
+            } else if (channel.parent && channel.parent.name === 'christmas-event-ideas'
+            ) {
                 await message.edit(`${BuildRole} ${ServRole}`);
                 await timeout(2000);
                 await message.delete();
-            }
-            else if (channel.parent && channel.parent.name === 'support') {
+            } else if (channel.parent && channel.parent.name === 'support') {
                 await message.edit(
                     `Hello <@!${channel.ownerId}>! Someone will help you shortly, please do not ping moderators or other people and just wait for someone to come help. While waiting please check out <#1077195187698274324> to see if it already answers your question.`
                 );
