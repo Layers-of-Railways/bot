@@ -1,5 +1,4 @@
 import express from 'express';
-import { handleGithubWebhook } from './webserver/github';
 import { client } from './index';
 import { handleBanShare } from './webserver/banshare';
 import { handleUnbanShare } from './webserver/unbanshare';
@@ -10,10 +9,6 @@ app.use(express.json());
 
 app.get('/', function (_, res) {
     res.status(200).send('Request received successfully');
-});
-
-app.post('/github-webhook', function (req, res) {
-    handleGithubWebhook(client, req, res);
 });
 
 app.post('/banshare', function (req, res) {

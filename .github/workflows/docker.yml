@@ -1,33 +1,25 @@
-name: Docker
+name: Publish Docker Image
 
-on:
-    push:
-        branches: [main]
+on: [workflow_dispatch]
 
 env:
     REGISTRY: ghcr.io
-    IMAGE_NAME: layers-of-railways/bot
-
-permissions:
-    contents: read
-    packages: write
+    IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-    build:
+    build-and-push-image:
         runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                platform:
-                    - linux/arm64
-                    - linux/amd64
-
+        permissions:
+            contents: read
+            packages: write
+            attestations: write
+            id-token: write
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
 
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
-              if: ${{ matrix.platform != 'linux/amd64' }}
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
@@ -44,73 +36,20 @@ jobs:
               uses: docker/metadata-action@v5
               with:
                   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-                  tags: |
-                      type=ref,event=branch
-                      type=raw,value=latest
 
-            - name: Build and push by digest
-              uses: docker/build-push-action@v5
-              id: build
+            - name: Build and push Docker image
+              id: push
+              uses: docker/build-push-action@v6
               with:
                   context: .
-                  provenance: false
+                  push: true
+                  platforms: linux/amd64,linux/arm64
+                  tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
-                  platforms: ${{ matrix.platform }}
-                  outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-                  cache-from: type=gha
-                  cache-to: type=gha,mode=max
 
-            - name: Export digests
-              run: |
-                  mkdir -p /tmp/digests
-                  digest="${{ steps.build.outputs.digest }}"
-                  touch "/tmp/digests/${digest#sha256:}"
-
-            - name: Upload digests
-              uses: actions/upload-artifact@v3 # V4 doesn't let us push to the same artifact
+            - name: Generate artifact attestation
+              uses: actions/attest-build-provenance@v2
               with:
-                  name: digests
-                  path: /tmp/digests/*
-                  if-no-files-found: error
-                  retention-days: 1
-
-    push:
-        runs-on: ubuntu-latest
-        needs:
-            - build
-
-        steps:
-            - name: Download digests
-              uses: actions/download-artifact@v3
-              with:
-                  name: digests
-                  path: /tmp/digests
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
-
-            - name: Log in to the Container registry
-              uses: docker/login-action@v3
-              with:
-                  registry: ${{ env.REGISTRY }}
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Extract metadata (tags, labels) for Docker
-              id: meta
-              uses: docker/metadata-action@v5
-              with:
-                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-                  tags: |
-                      type=ref,event=branch
-                      type=raw,value=latest
-
-            - name: Create manifest list and push
-              working-directory: /tmp/digests
-              run: |
-                  docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-                    $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
-
-            - name: Inspect image
-              run: |
-                  docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+                  subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+                  subject-digest: ${{ steps.push.outputs.digest }}
+                  push-to-registry: true
