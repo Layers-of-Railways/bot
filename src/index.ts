@@ -96,7 +96,7 @@ client.on(Events.ThreadCreate, async (channel) => {
             );
             const ServRole = channel.guild.roles.cache.find(
                 (r) => r.name === 'Minecraft Server Moderator'
-            )
+            );
 
             await timeout(2000);
 
@@ -110,15 +110,23 @@ client.on(Events.ThreadCreate, async (channel) => {
 
             await timeout(2000);
 
-            if (channel.parent && channel.parent.name === 'server-suggestions') {
+            if (
+                channel.parent &&
+                channel.parent.name === 'server-suggestions'
+            ) {
                 await message.edit(`${ServRole}`);
                 await timeout(2000);
                 await message.delete();
-            } else if (channel.parent && channel.parent.name === 'server-classifieds') {
+            } else if (
+                channel.parent &&
+                channel.parent.name === 'server-classifieds'
+            ) {
                 await message.edit(`${ServRole}`);
                 await timeout(2000);
                 await message.delete();
-            } else if (channel.parent && channel.parent.name === 'christmas-event-ideas'
+            } else if (
+                channel.parent &&
+                channel.parent.name === 'christmas-event-ideas'
             ) {
                 await message.edit(`${BuildRole} ${ServRole}`);
                 await timeout(2000);
